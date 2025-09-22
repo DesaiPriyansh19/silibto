@@ -22,7 +22,7 @@ export default function Navbar() {
   ];
 
   const lowerNavItems = {
-    Sales: ["Item1", "Item2"],
+    Sales: ["New Lead ", "New Inquiry","Pending Inquiry" ],
     Purchase: ["Item1", "Item2"],
     Stocks: ["Item1", "Item2"]
   };
