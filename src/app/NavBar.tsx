@@ -21,11 +21,12 @@ export default function Navbar() {
     "User",
   ];
 
-  const lowerNavItems = {
-    Sales: ["New Lead", "New Inquiry", "Pending Inquiry"],
-    Purchase: ["New Order", "Pending Order", "Supplier List"],
-    Stocks: ["New", "Stuck", "Cleaned"],
-  };
+ const lowerNavItems: { [key: string]: string[] } = {
+  Sales: ["Item1", "Item2"],
+  Purchase: ["Item1", "Item2"],
+  Stocks: ["Item1", "Item2"]
+};
+
 
   return (
     <div className="flex w-full border-[#E6E6E6] border-b-4 min-h-[14vh]">
