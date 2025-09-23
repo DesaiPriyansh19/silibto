@@ -72,9 +72,9 @@ export default function HomePage() {
           <div className="flex justify-between items-center">
             <p className="font-semibold">Purchase Order</p>
          <div className="group inline-flex items-center">
-  <div className="bg-black p-2 rounded-full transition-transform duration-300 ease-in-out group-hover:scale-105 group-hover:bg-gray-800 cursor-pointer">
+  <div className="bg-black p-2 rounded-full transition-transform duration-100 ease-in-out group-hover:scale-105 group-hover:bg-gray-800 cursor-pointer">
     <FiArrowRight 
-      className="text-white transition-transform duration-300 ease-in-out group-hover:translate-x-1" 
+      className="text-white transition-transform duration-100 ease-in-out group-hover:translate-x-1" 
     />
   </div>
 </div>
@@ -96,9 +96,9 @@ export default function HomePage() {
           <div className="flex justify-between items-center">
             <p className="font-semibold">Purchase Order</p>
          <div className="group inline-flex items-center">
-  <div className="bg-black p-2 rounded-full transition-transform duration-300 ease-in-out group-hover:scale-105 group-hover:bg-gray-800 cursor-pointer">
+  <div className="bg-black p-2 rounded-full transition-transform duration-100 ease-in-out group-hover:scale-105 group-hover:bg-gray-800 cursor-pointer">
     <FiArrowRight 
-      className="text-white transition-transform duration-300 ease-in-out group-hover:translate-x-1" 
+      className="text-white transition-transform duration-100 ease-in-out group-hover:translate-x-1" 
     />
   </div>
 </div>
@@ -120,9 +120,9 @@ export default function HomePage() {
           <div className="flex justify-between items-center">
             <p className="font-semibold">Purder</p>
          <div className="group inline-flex items-center">
-  <div className="bg-black p-2 rounded-full transition-transform duration-300 ease-in-out group-hover:scale-105 group-hover:bg-gray-800 cursor-pointer">
+  <div className="bg-black p-2 rounded-full transition-transform duration-100 ease-in-out group-hover:scale-105 group-hover:bg-gray-800 cursor-pointer">
     <FiArrowRight 
-      className="text-white transition-transform duration-300 ease-in-out group-hover:translate-x-1" 
+      className="text-white transition-transform duration-100 ease-in-out group-hover:translate-x-1" 
     />
   </div>
 </div>
@@ -144,9 +144,9 @@ export default function HomePage() {
           <div className="flex justify-between items-center">
             <p className="font-semibold">Purchase Order</p>
          <div className="group inline-flex items-center">
-  <div className="bg-black p-2 rounded-full transition-transform duration-300 ease-in-out group-hover:scale-105 group-hover:bg-gray-800 cursor-pointer">
+  <div className="bg-black p-2 rounded-full transition-transform duration-100 ease-in-out group-hover:scale-105 group-hover:bg-gray-800 cursor-pointer">
     <FiArrowRight 
-      className="text-white transition-transform duration-300 ease-in-out group-hover:translate-x-1" 
+      className="text-white transition-transform duration-100 ease-in-out group-hover:translate-x-1" 
     />
   </div>
 </div>
@@ -175,10 +175,10 @@ export default function HomePage() {
      <div
   key={i}
   className={`w-full sm:w-[20%] lg:w-[15%] border-2 rounded-lg py-4 px-2 flex flex-col items-center ${op.bg} ${op.border} 
-              hover:shadow-lg transition-shadow duration-300`}
+              hover:shadow-lg transition-shadow duration-100`}
 >
   <div className="text-white text-sm p-4 rounded-full mb-3 bg-[#2C2C2C] 
-                  hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
+                  hover:shadow-lg hover:-translate-y-1 hover:scale-95 transition-all duration-200">
     <Icon className="text-2xl" />
   </div>
   <h4 className="font-medium">{op.name}</h4>
