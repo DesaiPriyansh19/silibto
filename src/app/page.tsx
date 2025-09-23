@@ -2,7 +2,7 @@
 
 import React from "react";
 import Image from "next/image";
-import { FiSearch, FiX, FiBell, FiSettings, FiArrowRight } from "react-icons/fi";
+import {  FiX, FiBell, FiSettings, FiArrowRight } from "react-icons/fi";
 import {
   LineChart,
   Line,
@@ -12,7 +12,10 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from "recharts";
-
+import DeliveryIcon from "@/assets/icons/DeliveryIcon.svg";
+import DownArrow from "@/assets/icons/DownArrow.svg";
+import FileIcon from "@/assets/icons/FileIcon.svg";
+import PoIcon from "@/assets/icons/PoIcon.svg";
 const data = [
   { month: "Jan", sales: 10000 },
   { month: "Feb", sales: 20000 },
@@ -20,14 +23,21 @@ const data = [
   { month: "Apr", sales: 25000 },
   { month: "May", sales: 30000 },
 ];
+const operations = [
+  { name: "Make Sell", icon: FileIcon,bg: "bg-[#e2f4ff]", border: "border-[#88C9F2]"  },
+  { name: "Place PO", icon: PoIcon ,bg: "bg-[#fadada]", border: "border-[#F28888]"  },
+  { name: "Rec. PO", icon: DownArrow ,bg: "bg-[#d9fcde]", border: "border-[#8BE497]"  },
+  { name: "Delivery", icon: DeliveryIcon ,bg: "bg-[#f1e6fe]", border: "border-[#D9B9FF]"  },
+];
+
 
 export default function HomePage() {
   return (
-    <div className="p-6 space-y-8">
+    <div className="p-4 md:p-6 space-y-8">
       {/* Top Bar */}
-      <div className="flex flex-col md:flex-row items-center justify-between gap-4">
+      <div className="flex flex-col md:flex-row items-center justify-between gap-4 border-[#fadada]">
         {/* Left - Logo + Welcome */}
-        <div className="hidden lg:flex items-center gap-2">
+        <div className="hidden lg:static lg:flex items-center gap-2">
           <Image src="/user-avatar.png" alt="Logo" width={40} height={40} />
           <div>
             <p className="text-sm font-bold">Welcome</p>
@@ -36,7 +46,7 @@ export default function HomePage() {
         </div>
 
         {/* Middle - Search */}
-        <div className="flex items-center bg-gray-100 rounded-full px-3 py-2 w-full md:w-1/3">
+        <div className="flex items-center bg-white border-[2px]  border-[#E6E6E6] rounded-full px-3 py-2 w-full md:w-1/3">
           <FiX className="text-gray-500 mr-2" />
           <input
             type="text"
@@ -46,7 +56,7 @@ export default function HomePage() {
         </div>
 
         {/* Right - Icons + Year */}
-        <div className="flex items-center gap-4">
+        <div className=" hidden lg:flex items-center gap-4">
           <FiBell className="text-xl cursor-pointer" />
           <FiSettings className="text-xl cursor-pointer" />
           <select className="rounded-full border px-3 py-1">
@@ -57,16 +67,21 @@ export default function HomePage() {
       </div>
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
-        <div className="bg-gradient-to-r from-[#FFFFFF] to-[#81D9E6] text-black p-4 rounded-lg">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 ">
+        <div className="bg-gradient-to-r from-[#FFFFFF] to-[#81D9E6] text-black p-4 rounded-lg hover:shadow-lg">
           <div className="flex justify-between items-center">
             <p className="font-semibold">Purchase Order</p>
-            <div className="bg-black p-2 rounded-full hover:scale-115 transition-all duration-200 cursor-pointer hover:ml-1.5">
-              <FiArrowRight className="text-white" />
-            </div>
+         <div className="group inline-flex items-center">
+  <div className="bg-black p-2 rounded-full transition-transform duration-300 ease-in-out group-hover:scale-105 group-hover:bg-gray-800 cursor-pointer">
+    <FiArrowRight 
+      className="text-white transition-transform duration-300 ease-in-out group-hover:translate-x-1" 
+    />
+  </div>
+</div>
+
           </div>
-          <div className="mt-4 space-y-2">
-            <div className="flex justify-between">
+          <div className="mt-4 space-y-2 font-extralight  ">
+            <div className="flex justify-between ">
               <p>Pending</p>
               <p>55</p>
             </div>
@@ -77,15 +92,20 @@ export default function HomePage() {
           </div>
         </div>
 
-        <div className="bg-gradient-to-r from-[#FFFFFF] to-[#8BE497] text-black p-4 rounded-lg">
+        <div className="bg-gradient-to-r from-[#FFFFFF] to-[#8BE497] text-black p-4 rounded-lg hover:shadow-lg">
           <div className="flex justify-between items-center">
             <p className="font-semibold">Purchase Order</p>
-            <div className="bg-black p-2 rounded-full hover:scale-115 transition-all duration-100 cursor-pointer">
-              <FiArrowRight className="text-white" />
-            </div>
+         <div className="group inline-flex items-center">
+  <div className="bg-black p-2 rounded-full transition-transform duration-300 ease-in-out group-hover:scale-105 group-hover:bg-gray-800 cursor-pointer">
+    <FiArrowRight 
+      className="text-white transition-transform duration-300 ease-in-out group-hover:translate-x-1" 
+    />
+  </div>
+</div>
+
           </div>
-          <div className="mt-4 space-y-2">
-            <div className="flex justify-between">
+          <div className="mt-4 space-y-2 font-extralight  ">
+            <div className="flex justify-between ">
               <p>Pending</p>
               <p>55</p>
             </div>
@@ -96,15 +116,20 @@ export default function HomePage() {
           </div>
         </div>
 
-        <div className="bg-gradient-to-r from-[#FFFFFF] to-[#FFB1B1] text-black p-4 rounded-lg">
+        <div className="bg-gradient-to-r from-[#FFFFFF] to-[#FFB1B1] text-black p-4 rounded-lg hover:shadow-lg">
           <div className="flex justify-between items-center">
-            <p className="font-semibold">Purchase Order</p>
-            <div className="bg-black p-2 rounded-full hover:scale-115 transition-all duration-100 cursor-pointer">
-              <FiArrowRight className="text-white" />
-            </div>
+            <p className="font-semibold">Purder</p>
+         <div className="group inline-flex items-center">
+  <div className="bg-black p-2 rounded-full transition-transform duration-300 ease-in-out group-hover:scale-105 group-hover:bg-gray-800 cursor-pointer">
+    <FiArrowRight 
+      className="text-white transition-transform duration-300 ease-in-out group-hover:translate-x-1" 
+    />
+  </div>
+</div>
+
           </div>
-          <div className="mt-4 space-y-2">
-            <div className="flex justify-between">
+          <div className="mt-4 space-y-2 font-extralight  ">
+            <div className="flex justify-between ">
               <p>Pending</p>
               <p>55</p>
             </div>
@@ -115,15 +140,20 @@ export default function HomePage() {
           </div>
         </div>
 
-        <div className="bg-gradient-to-r from-[#FFFFFF] to-[#D9B9FF] text-black p-4 rounded-lg">
+        <div className="bg-gradient-to-r from-[#FFFFFF] to-[#D9B9FF] text-black p-4 rounded-lg hover:shadow-lg">
           <div className="flex justify-between items-center">
             <p className="font-semibold">Purchase Order</p>
-            <div className="bg-black p-2 rounded-full hover:scale-115 transition-all duration-100 cursor-pointer">
-              <FiArrowRight className="text-white" />
-            </div>
+         <div className="group inline-flex items-center">
+  <div className="bg-black p-2 rounded-full transition-transform duration-300 ease-in-out group-hover:scale-105 group-hover:bg-gray-800 cursor-pointer">
+    <FiArrowRight 
+      className="text-white transition-transform duration-300 ease-in-out group-hover:translate-x-1" 
+    />
+  </div>
+</div>
+
           </div>
-          <div className="mt-4 space-y-2">
-            <div className="flex justify-between">
+          <div className="mt-4 space-y-2 font-extralight  ">
+            <div className="flex justify-between ">
               <p>Pending</p>
               <p>55</p>
             </div>
@@ -136,32 +166,42 @@ export default function HomePage() {
       </div>
 
       {/* Operations */}
-      <div>
-        <h2 className="text-xl font-bold mb-4">Operations</h2>
-        <div className="w-full flex flex-wrap justify-start items-center gap-6">
-          {["Make Sell", "Place PO", "Rec. PO", "Delivery"].map((op, i) => (
-            <div
-              key={i}
-              className="w-full sm:w-1/2 md:w-1/4 border rounded-lg p-6 flex flex-col items-center"
-            >
-              <div className="bg-black text-white p-4 rounded-full mb-3">Logo</div>
-              <h4 className="font-medium">{op}</h4>
-            </div>
-          ))}
-        </div>
-      </div>
+<div>
+  <h2 className="text-xl font-bold mb-4">Operations</h2>
+  <div className="w-full grid grid-cols-2 sm:flex sm:flex-wrap lg:flex-row lg:flex-nowrap justify-start items-center gap-6">
+    {operations.map((op, i) => {
+      const Icon = op.icon;
+      return (
+     <div
+  key={i}
+  className={`w-full sm:w-[20%] lg:w-[15%] border-2 rounded-lg py-4 px-2 flex flex-col items-center ${op.bg} ${op.border} 
+              hover:shadow-lg transition-shadow duration-300`}
+>
+  <div className="text-white text-sm p-4 rounded-full mb-3 bg-[#2C2C2C] 
+                  hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
+    <Icon className="text-2xl" />
+  </div>
+  <h4 className="font-medium">{op.name}</h4>
+</div>
+
+      );
+    })}
+  </div>
+</div>
+
+
 
       {/* Sales Report */}
-      <div>
+      <div className="">
         <h2 className="text-xl font-bold mb-4">Sales Report</h2>
-        <div className="w-full h-72 bg-white rounded-lg border p-4">
+        <div className="w-full h-96 text-sm lg:text-lg xl:text-xl bg-white rounded-lg border lg:p-4">
           <ResponsiveContainer width="100%" height="100%">
             <LineChart data={data}>
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis dataKey="month" />
               <YAxis tickFormatter={(val) => `${val / 1000}k`} />
               <Tooltip />
-              <Line type="monotone" dataKey="sales" stroke="#03B58B" strokeWidth={2} />
+              <Line type="monotone" dataKey="sales" stroke="#81D9E6" strokeWidth={2} />
             </LineChart>
           </ResponsiveContainer>
         </div>

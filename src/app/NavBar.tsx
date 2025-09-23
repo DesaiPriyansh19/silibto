@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Image from "next/image";
 import { HiMenu, HiX, HiChevronRight, HiChevronDown } from "react-icons/hi";
-
+import { FiSearch, FiX, FiBell, FiSettings, FiArrowRight } from "react-icons/fi";
 export default function Navbar() {
   const [activeUpper, setActiveUpper] = useState<keyof typeof lowerNavItems>("Sales");
   const [activeLower, setActiveLower] = useState("");
@@ -29,6 +29,7 @@ export default function Navbar() {
 
   return (
     <div className="flex w-full border-[#E6E6E6] border-b-4 min-h-[14vh]">
+
       {/* Left - Logo */}
       <div className=" lg:w-[15%] hidden lg:flex items-center justify-center">
         <Image src="/logo.webp" alt="Logo" width={110} height={110} />
@@ -166,6 +167,15 @@ export default function Navbar() {
                 );
               })}
             </ul>
+                {/* Right - Icons + Year */}
+                    <div className="absolute right-1 bottom-2 flex items-center gap-4">
+                      <FiBell className="text-2xl cursor-pointer" />
+                      <FiSettings className="text-2xl cursor-pointer" />
+                      <select className="rounded-full border px-3 py-1">
+                        <option>2024</option>
+                        <option>2023</option>
+                      </select>
+                    </div>
           </div>
         </>
       )}
