@@ -10,7 +10,7 @@ import {
 } from "react-icons/hi";
 import { FiBell, FiSettings } from "react-icons/fi";
 import Link from "next/link";
-import Home from "@/assets/icons/home.svg";
+import Home from "@/assets/icons/Home.svg";
 
 // Define lower nav structure
 const lowerNavItems: Record<string, string[]> = {
