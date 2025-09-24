@@ -54,13 +54,13 @@ function AddNewClient() {
 
     {/* Phone Fields */}
     <div className="flex flex-col gap-3">
-   <div className="flex gap-2 items-center">
+   <div className="flex flex-col md:flex-row gap-2 items-center">
         <input
           type="text"
           placeholder="Phone No 1"
           className="flex flex-c border-[2px] border-gray-300 rounded-lg px-3 py-2 outline-none"
         />
-        <label className="flex items-center text-sm gap-1">
+        <label className="flex  items-center text-sm gap-1">
           <input type="checkbox" className="accent-black " />
           primery
         </label>
@@ -69,7 +69,7 @@ function AddNewClient() {
         <input
           type="text"
           placeholder="Phone No 2"
-          className="flex flex-c border-[2px] border-gray-300 rounded-lg px-3 py-2 outline-none"
+          className="flex flex-col md:flex-row  border-[2px] border-gray-300 rounded-lg px-3 py-2 outline-none"
         />
         <label className="flex items-center text-sm gap-1">
           <input type="checkbox" className="accent-black " />
