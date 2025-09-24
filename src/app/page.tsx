@@ -123,11 +123,11 @@ export default function HomePage() {
           <div className="flex justify-between items-center">
             <p className="font-semibold">Delivery Tray</p>
          <div className="group inline-flex items-center">
-  <div className="bg-black p-2 rounded-full transition-transform duration-100 ease-in-out group-hover:scale-105 group-hover:bg-gray-800 cursor-pointer">
+<Link href={'/delivery'}> <div className="bg-black p-2 rounded-full transition-transform duration-100 ease-in-out group-hover:scale-105 group-hover:bg-gray-800 cursor-pointer">
     <FiArrowRight 
       className="text-white transition-transform duration-100 ease-in-out group-hover:translate-x-1" 
     />
-  </div>
+  </div></Link>
 </div>
 
           </div>
