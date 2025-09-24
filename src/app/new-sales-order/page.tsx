@@ -29,7 +29,7 @@ function NewSalesOrder() {
 
       <div className="flex items-center justify-start gap-2 px-6 mt-3.5">
         <h3 className="font-semibold text-sm">Bill to: </h3>
-        <input className="bg-white py-1 px-3 border-[2px] rounded-lg border-[#E6E6E6]" />
+        <input className="bg-white w-[60%] sm:w-[80%] py-1 px-3 border-[2px] rounded-lg border-[#E6E6E6]" />
       </div>
 
       <div className="flex items-center justify-start gap-2 px-6 mt-3.5">
