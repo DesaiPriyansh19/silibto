@@ -37,7 +37,7 @@ export default function EntryDateUpload() {
   };
 
   return (
-    <div className="flex justify-between items-center p-4 rounded-lg my-2">
+    <div className="flex justify-between items-center  rounded-lg my-2">
       {/* Left side: Entry Date */}
       <div className="flex flex-col items-center gap-1">
         <span className="text-gray-600 font-medium">Entry Date</span>
@@ -68,9 +68,9 @@ export default function EntryDateUpload() {
         />
         <button
           onClick={handleUploadClick}
-          className="flex items-center gap-2 border border-gray-400 px-4 py-2 rounded hover:bg-gray-50 text-gray-800 font-medium"
+          className="flex items-center text-sm sm:gap-2 border border-gray-400 mr-2  px-2 sm:px-4 py-2 rounded hover:bg-gray-50 text-gray-800 font-medium"
         >
-          <AiOutlineCamera size={20} />
+          <AiOutlineCamera size={50} />
           Upload New Prescription
         </button>
       </div>

@@ -8,7 +8,7 @@ function NewSalesOrder() {
     <><div className="md:px-6 lg:px-20 xl:px-24">
       {/* Head part */}
       <div className="flex items-center justify-center gap-1.5 px-2  mt-2.5">
-        <div className="flex items-center bg-white border-[2px] border-[#E6E6E6] rounded-full px-3 py-2 w-full md:w-1/3">
+        <div className="w-[70%] flex items-center bg-white border-[2px] border-[#E6E6E6] rounded-full px-3 py-2 sm: md:w-1/3">
           <input
             type="text"
             placeholder="Search product"
