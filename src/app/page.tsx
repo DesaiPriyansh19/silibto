@@ -16,6 +16,7 @@ import DeliveryIcon from "@/assets/icons/DeliveryIcon.svg";
 import DownArrow from "@/assets/icons/DownArrow.svg";
 import FileIcon from "@/assets/icons/FileIcon.svg";
 import PoIcon from "@/assets/icons/PoIcon.svg";
+import Link from "next/link";
 const data = [
   { month: "Jan", sales: 10000 },
   { month: "Feb", sales: 20000 },
@@ -24,10 +25,10 @@ const data = [
   { month: "May", sales: 30000 },
 ];
 const operations = [
-  { name: "Make Sell", icon: FileIcon,bg: "bg-[#e2f4ff]", border: "border-[#88C9F2]"  },
-  { name: "Place PO", icon: PoIcon ,bg: "bg-[#fadada]", border: "border-[#F28888]"  },
-  { name: "Rec. PO", icon: DownArrow ,bg: "bg-[#d9fcde]", border: "border-[#8BE497]"  },
-  { name: "Delivery", icon: DeliveryIcon ,bg: "bg-[#f1e6fe]", border: "border-[#D9B9FF]"  },
+  { name: "Make Sell", icon: FileIcon,bg: "bg-[#e2f4ff]", border: "border-[#88C9F2]" , link:"/new-sales-order" },
+  { name: "Place PO", icon: PoIcon ,bg: "bg-[#fadada]", border: "border-[#F28888]" , link:"/new-sales-order"  },
+  { name: "Rec. PO", icon: DownArrow ,bg: "bg-[#d9fcde]", border: "border-[#8BE497]", link:"/new-sales-order"  },
+  { name: "Delivery", icon: DeliveryIcon ,bg: "bg-[#f1e6fe]", border: "border-[#D9B9FF]" , link:"/new-sales-order" },
 ];
 
 
@@ -77,6 +78,7 @@ export default function HomePage() {
       className="text-white transition-transform duration-100 ease-in-out group-hover:translate-x-1" 
     />
   </div>
+  <div className=""></div>
 </div>
 
           </div>
@@ -177,10 +179,11 @@ export default function HomePage() {
   className={`w-full sm:w-[20%] lg:w-[15%] border-2 rounded-lg py-4 px-2 flex flex-col items-center ${op.bg} ${op.border} 
               hover:shadow-lg transition-shadow duration-100`}
 >
+ <Link href={op.link}>
   <div className="text-white text-sm p-4 rounded-full mb-3 bg-[#2C2C2C] 
                   hover:shadow-lg hover:-translate-y-1 hover:scale-95 transition-all duration-200">
     <Icon className="text-2xl" />
-  </div>
+  </div></Link>
   <h4 className="font-medium">{op.name}</h4>
 </div>
 
