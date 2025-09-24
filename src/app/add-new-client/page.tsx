@@ -99,8 +99,8 @@ function AddNewClient() {
 
   {/* Save & Next / Cancel Buttons */}
   <div className="flex flex-col sm:flex-row justify-end gap-3 mt-4">
-    <button className="bg-[#5DD86E] text-black px-4 py-2 rounded-lg">Save & Next</button>
-    <button className="bg-black text-white px-4 py-2 rounded-lg flex items-center gap-1">
+    <button className="bg-[#5DD86E] text-black px-4 py-2 rounded-lg hover:scale-95">Save & Next</button>
+    <button className="bg-black text-white px-4 py-2 rounded-lg flex items-center gap-1 hover:scale-95">
       <FiX /> Cancel
     </button>
   </div>
