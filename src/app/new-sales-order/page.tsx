@@ -122,7 +122,7 @@ function NewSalesOrder() {
         </button></div>
 
         <div className="flex flex-col  md:flex-row gap-5 md:gap-3 py-6  overflow-hidden items-center justify-between my-4 lg:my-6 ">
-<div className=" shadoww bg-[#e6f3fb] border-4 pb-2 border-[#88C9F2] rounded-xl w-[400px]">
+<div className=" shadoww bg-[#e6f3fb] border-4 pb-2 border-[#88C9F2] rounded-xl w-[95%] sm:w-[400px]">
   <div className="flex justify-between rounded-t-lg py-2 pl-4 pr-3 bg-[#88C9F2]  items-center mb-2">
     <h2 className="font-bold ">Right Eye</h2>
     <button className=" px-2 text-lg font-medium mr-4 border-2 rounded">+</button>
@@ -154,7 +154,7 @@ function NewSalesOrder() {
   ))}
 </div>
 
-<div className="shadoww hover: hover:shadoww2 bg-[#ffebeb] border-4 pb-2 border-[#FFB1B1] rounded-xl w-[400px] ">
+<div className="shadoww hover: hover:shadoww2 bg-[#ffebeb] border-4 pb-2 border-[#FFB1B1] rounded-xl w-[95%] sm:w-[400px] ">
   <div className="flex justify-between rounded-t-lg py-2 pl-4 pr-3 bg-[#FFB1B1]  items-center mb-2">
     <h2 className="font-bold ">Left Eye</h2>
     <button className=" px-2 text-lg font-medium mr-4 border-2 rounded">+</button>

@@ -28,7 +28,7 @@ const operations = [
   { name: "Make Sell", icon: FileIcon,bg: "bg-[#e2f4ff]", border: "border-[#88C9F2]" , link:"/new-sales-order" },
   { name: "Place PO", icon: PoIcon ,bg: "bg-[#fadada]", border: "border-[#F28888]" , link:"/new-sales-order"  },
   { name: "Rec. PO", icon: DownArrow ,bg: "bg-[#d9fcde]", border: "border-[#8BE497]", link:"/new-sales-order"  },
-  { name: "Delivery", icon: DeliveryIcon ,bg: "bg-[#f1e6fe]", border: "border-[#D9B9FF]" , link:"/new-sales-order" },
+  { name: "Delivery", icon: DeliveryIcon ,bg: "bg-[#f1e6fe]", border: "border-[#D9B9FF]" , link:"/delivery" },
 ];
 
 
@@ -69,16 +69,17 @@ export default function HomePage() {
 
       {/* Stats Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 ">
-        <div className="bg-gradient-to-r from-[#FFFFFF] to-[#81D9E6] text-black p-4 rounded-lg hover:shadow-lg">
+             <div className="bg-gradient-to-r from-[#FFFFFF] to-[#8BE497] text-black p-4 rounded-lg hover:shadow-lg">
           <div className="flex justify-between items-center">
             <p className="font-semibold">Purchase Order</p>
          <div className="group inline-flex items-center">
-  <div className="bg-black p-2 rounded-full transition-transform duration-100 ease-in-out group-hover:scale-105 group-hover:bg-gray-800 cursor-pointer">
+
+  <Link href={''}><div className="bg-black p-2 rounded-full transition-transform duration-100 ease-in-out group-hover:scale-105 group-hover:bg-gray-800 cursor-pointer">
     <FiArrowRight 
       className="text-white transition-transform duration-100 ease-in-out group-hover:translate-x-1" 
     />
-  </div>
-  <div className=""></div>
+  </div></Link>
+
 </div>
 
           </div>
@@ -93,16 +94,16 @@ export default function HomePage() {
             </div>
           </div>
         </div>
-
-        <div className="bg-gradient-to-r from-[#FFFFFF] to-[#8BE497] text-black p-4 rounded-lg hover:shadow-lg">
+        <div className="bg-gradient-to-r from-[#FFFFFF] to-[#81D9E6] text-black p-4 rounded-lg hover:shadow-lg">
           <div className="flex justify-between items-center">
-            <p className="font-semibold">Purchase Order</p>
+            <p className="font-semibold">Sales Order</p>
          <div className="group inline-flex items-center">
-  <div className="bg-black p-2 rounded-full transition-transform duration-100 ease-in-out group-hover:scale-105 group-hover:bg-gray-800 cursor-pointer">
+  <Link href={'/new-sales-order'}><div className="bg-black p-2 rounded-full transition-transform duration-100 ease-in-out group-hover:scale-105 group-hover:bg-gray-800 cursor-pointer">
     <FiArrowRight 
       className="text-white transition-transform duration-100 ease-in-out group-hover:translate-x-1" 
     />
-  </div>
+  </div></Link>
+  <div className=""></div>
 </div>
 
           </div>
@@ -120,7 +121,7 @@ export default function HomePage() {
 
         <div className="bg-gradient-to-r from-[#FFFFFF] to-[#FFB1B1] text-black p-4 rounded-lg hover:shadow-lg">
           <div className="flex justify-between items-center">
-            <p className="font-semibold">Purder</p>
+            <p className="font-semibold">Delivery Tray</p>
          <div className="group inline-flex items-center">
   <div className="bg-black p-2 rounded-full transition-transform duration-100 ease-in-out group-hover:scale-105 group-hover:bg-gray-800 cursor-pointer">
     <FiArrowRight 
@@ -144,7 +145,7 @@ export default function HomePage() {
 
         <div className="bg-gradient-to-r from-[#FFFFFF] to-[#D9B9FF] text-black p-4 rounded-lg hover:shadow-lg">
           <div className="flex justify-between items-center">
-            <p className="font-semibold">Purchase Order</p>
+            <p className="font-semibold">Vendor Tray</p>
          <div className="group inline-flex items-center">
   <div className="bg-black p-2 rounded-full transition-transform duration-100 ease-in-out group-hover:scale-105 group-hover:bg-gray-800 cursor-pointer">
     <FiArrowRight 

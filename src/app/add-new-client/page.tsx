@@ -54,20 +54,26 @@ function AddNewClient() {
 
     {/* Phone Fields */}
     <div className="flex flex-col gap-3">
-      <input
-        type="text"
-        placeholder="Phone No 1"
-        className="border-[2px] border-gray-300 rounded-lg px-3 py-2 outline-none"
-      />
+   <div className="flex gap-2 items-center">
+        <input
+          type="text"
+          placeholder="Phone No 1"
+          className="flex flex-c border-[2px] border-gray-300 rounded-lg px-3 py-2 outline-none"
+        />
+        <label className="flex items-center text-sm gap-1">
+          <input type="checkbox" className="accent-black " />
+          primery
+        </label>
+      </div>
       <div className="flex gap-2 items-center">
         <input
           type="text"
           placeholder="Phone No 2"
-          className="flex-1 border-[2px] border-gray-300 rounded-lg px-3 py-2 outline-none"
+          className="flex flex-c border-[2px] border-gray-300 rounded-lg px-3 py-2 outline-none"
         />
         <label className="flex items-center text-sm gap-1">
           <input type="checkbox" className="accent-black " />
-          Same as Phone 1
+          primery
         </label>
       </div>
     </div>
@@ -88,7 +94,7 @@ function AddNewClient() {
   </div>
 
   {/* Family Group and Create Button */}
-  <div className="flex flex-col lg:flex-row gap-3 mt-4 lg:items-center">
+  <div className="flex flex-row gap-3 mt-4 lg:items-center">
     <select className="flex-1 border-[2px] border-gray-300 rounded-lg px-3 py-2 outline-none">
       <option>Select Family Group</option>
       <option>Group A</option>
