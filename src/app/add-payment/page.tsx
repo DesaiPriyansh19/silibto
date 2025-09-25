@@ -44,7 +44,7 @@ function AddPayment() {
         ))}
      
       </div>
-         <input type="number" className="bg-white rounded-lg border-[1px] border-black"/>
+         <input type="number" placeholder="Amount" className="bg-white rounded-sm text-sm px-2 py-1 mt-1  border-[1.5px] border-black"/>
     </div>
   
 </div>
