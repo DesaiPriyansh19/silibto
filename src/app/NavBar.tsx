@@ -1,7 +1,7 @@
 "use client";
 "use client";
 import { useAuth } from "@/context/AuthContext";
-
+import { useEffect } from "react";
 import { useState } from "react";
 import Image from "next/image";
 import {
@@ -53,7 +53,15 @@ export default function Navbar() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [openSubMenu, setOpenSubMenu] = useState<string | null>(null);
 const { logout } = useAuth();
-
+useEffect(() => {
+  if (isSidebarOpen) {
+    // Lock scroll
+    document.body.style.overflow = "hidden";
+  } else {
+    // Unlock scroll
+    document.body.style.overflow = "auto";
+  }
+}, [isSidebarOpen]);
   return (
     <div className="flex w-full border-[#E6E6E6] border-b-4 min-h-[14vh]">
       {/* Left - Logo */}
@@ -167,7 +175,7 @@ const { logout } = useAuth();
             onClick={() => setIsSidebarOpen(false)}
           ></div>
 
-          <div className="fixed top-0 right-0 w-64 h-full bg-white shadow-lg z-50 flex flex-col transition-transform duration-300">
+          <div className="fixed top-0 right-0 w-64 h-full bg-white shadow-lg z-50 flex flex-col overflow-y-auto transition-transform duration-300">
             <div className="flex justify-between p-4">
               <div className="flex ">
                 <Image
