@@ -45,7 +45,7 @@ export default function LoginPage() {
       <div className="flex-1 flex items-center justify-center p-6 text-[#0d751b]">
         <div className="bg-[#f5fff6] border-2 border-[#06b81e] p-8 md:p-10 rounded-2xl shadow-xl w-full max-w-md transition-all hover:shadow-2xl">
           <h2 className="text-2xl md:text-3xl font-semibold mb-2">
-            Welcome to Silibito
+            Welcome to Silibto
           </h2>
           <p className="mb-6 font-light text-base md:text-lg">Please login to continue</p>
 
