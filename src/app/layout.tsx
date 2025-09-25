@@ -1,8 +1,9 @@
+// layout.tsx - SERVER COMPONENT
 import "./globals.css";
 import { Poppins } from "next/font/google";
 import type { Metadata } from "next";
-import Navbar from "./NavBar";
 import PageTransitionProvider from "@/components/PageTransitionProvider";
+import ClientWrapper from "./ClientWrapper";
 
 
 const poppins = Poppins({
@@ -13,31 +14,16 @@ const poppins = Poppins({
 
 export const metadata: Metadata = {
   title: "Silibto - Spectacle Shop Management",
-  description: "Manage multiple spectacle shops efficiently with our custom solution.",
-  keywords: ["spectacle shop", "multi-shop management", "inventory", "dashboard", "Next.js"],
-  authors: [{ name: "tech tycoons", url: "https://yourwebsite.com" }],
-  creator: "tech tycoons",
-  icons: {
-    icon: "/favicon.ico",
-    shortcut: "/favicon.ico",
-    apple: "/apple-touch-icon.png",
-  },
+  description: "Manage multiple spectacle shops efficiently",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
       <body className={`${poppins.variable} antialiased flex flex-col min-h-screen`}>
-        <header>
-          <Navbar />
-        </header>
-
-        {/* Wrap pages in client-side transitions */}
-        <PageTransitionProvider>
-          {children}
-          </PageTransitionProvider>
-
-        <footer>{/* Footer goes here */}</footer>
+        <ClientWrapper>
+          <PageTransitionProvider>{children}</PageTransitionProvider>
+        </ClientWrapper>
       </body>
     </html>
   );

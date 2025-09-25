@@ -1,4 +1,6 @@
 "use client";
+"use client";
+import { useAuth } from "@/context/AuthContext";
 
 import { useState } from "react";
 import Image from "next/image";
@@ -50,6 +52,7 @@ export default function Navbar() {
  const [activeLower, setActiveLower] = useState<string>("");
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [openSubMenu, setOpenSubMenu] = useState<string | null>(null);
+const { logout } = useAuth();
 
   return (
     <div className="flex w-full border-[#E6E6E6] border-b-4 min-h-[14vh]">
@@ -99,6 +102,13 @@ export default function Navbar() {
 </li>
 
             ))}
+            <li className="cursor-pointer hover:scale-105 transition-all duration-100 flex items-center justify-center px-2 h-full text-red-700">          {/* Logout button */}
+  <button
+    onClick={logout}
+    className=""
+  >
+    Logout
+  </button></li>
         </ul>
 
         <ul className="flex bg-[#F2F2F2] h-[50%] pl-2">
@@ -106,6 +116,7 @@ export default function Navbar() {
             const href = lowerNavLinks[item];
             return (
               // inside lower nav rendering
+        
 <li
   key={item}
   onClick={() => setActiveLower(`${activeUpper}|${item}`)}
@@ -117,8 +128,10 @@ export default function Navbar() {
 >
   {href ? <Link href={href}>{item}</Link> : item}
 </li>
-            );
+           
+          );
           })}
+  
         </ul>
       </div>
 
@@ -247,6 +260,12 @@ export default function Navbar() {
                   </li>
                 );
               })}
+              <li> <button
+    onClick={logout}
+    className=" ml-2 border-[1px] border-red-700 px-2 py-1 text-sm rounded-sm mt-3"
+  >
+    Logout
+  </button> </li>
             </ul>
             {/* Right - Icons + Year */}
             <div className="absolute right-1 bottom-2 flex items-center gap-4">
