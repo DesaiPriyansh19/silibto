@@ -268,17 +268,18 @@ useEffect(() => {
                   </li>
                 );
               })}
-              <li> <button
-    onClick={logout}
-    className=" ml-2 border-[1px] border-red-700 px-2 py-1 text-sm rounded-sm mt-3"
-  >
-    Logout
-  </button> </li>
+           
             </ul>
             {/* Right - Icons + Year */}
-            <div className="absolute right-1 bottom-2 flex items-center gap-4">
-              <FiBell className="text-2xl cursor-pointer" />
-              <FiSettings className="text-2xl cursor-pointer" />
+            <div className="absolute bg-white z-10right-1 bottom-2 flex items-center gap-4">
+              <button
+    onClick={logout}
+    className=" ml-2 border-[1px] border-red-700 text-red-700 px-2 py-1 text-sm rounded-sm mt-3"
+  >
+    Logout
+  </button> 
+              <FiBell className="text-xl cursor-pointer" />
+              <FiSettings className="text-xl cursor-pointer" />
               <select className="rounded-full border px-3 py-1">
                 <option>2024</option>
                 <option>2023</option>
