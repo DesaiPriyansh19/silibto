@@ -33,7 +33,7 @@ export default function LoginPage() {
       {/* Left Section - Logo */}
       <div className="flex-1 flex items-center justify-center p-6">
         <Image
-          src={"/small-logo-big.png"}
+          src={"/logo-big.png"}
           alt="Silibito Logo"
           width={200}
           height={200}
