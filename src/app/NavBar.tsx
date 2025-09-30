@@ -76,7 +76,9 @@ useEffect(() => {
 
       {/* Middle Nav */}
       <div className="w-[60%] lg:w-[70%] pl-2 hidden lg:block">
-        <ul className="flex gap-2 font-semibold text-sm bg-[#E6E6E6] h-[50%]">
+<ul className="flex gap-2 font-semibold text-sm bg-[#E6E6E6] overflow-x-scroll h-[50%] scrollbar-hide">
+
+
           {/* Home Logo */}
           <li
             onClick={() => {
