@@ -16,6 +16,7 @@ import Home from "@/assets/icons/Home.svg";
 
 // Define lower nav structure
 const lowerNavItems: Record<string, string[]> = {
+  Product:["Product Master"],
   Sales: ["New Lead", "New Inquiry", "Pending Inquiry"],
   Purchase: ["Purchase Item1", "Purchase Item2"],
   Stocks: ["Stocks Item1", "Stocks Item2"],
@@ -24,6 +25,7 @@ const lowerNavItems: Record<string, string[]> = {
 
 // Map each submenu item to a href
 const lowerNavLinks: Record<string, string> = {
+  "Product Master":"/product/product-master",
   "New Lead": "",
   "New Inquiry": "",
   "Pending Inquiry": "",
@@ -37,6 +39,7 @@ const lowerNavLinks: Record<string, string> = {
 // Upper nav items
 const upperNavItems: string[] = [
   "Home",
+    "Product",
   "Sales",
   "Purchase",
   "Stocks",
@@ -112,7 +115,9 @@ useEffect(() => {
 </li>
 
             ))}
-            <li className="cursor-pointer hover:scale-105 transition-all duration-100 flex items-center justify-center px-2 h-full text-red-700">          {/* Logout button */}
+
+             {/* Logout button */}
+            <li className="cursor-pointer hover:scale-105 transition-all duration-100 flex items-center justify-center px-2 h-full text-red-700">         
   <button
     onClick={logout}
     className=""
