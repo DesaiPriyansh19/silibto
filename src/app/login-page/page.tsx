@@ -16,7 +16,7 @@ export default function LoginPage() {
   const [selectedBranch, setSelectedBranch] = useState("");
 
   const router = useRouter();
-
+console.log("Backend URL:", process.env.NEXT_PUBLIC_SERVER_URL);
   // Handle branch selection display or redirect
   useEffect(() => {
     if (isAuthenticated && user) {
@@ -36,7 +36,7 @@ export default function LoginPage() {
   }, [isAuthenticated, user, router, selectBranch]);
 
   const handleLogin = async (e: React.FormEvent) => {
-    console.log("Backend URL:", process.env.NEXT_PUBLIC_SERVER_URL);
+    
 
     e.preventDefault();
     if (!userId || !password) {
