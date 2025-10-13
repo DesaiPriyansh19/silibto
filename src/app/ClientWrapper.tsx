@@ -11,7 +11,7 @@ export default function ClientWrapper({ children }: { children: React.ReactNode 
 
   return (
     <AuthProvider>
-      {pathname !== "/login-page" && <Navbar/>}
+      {pathname !== "/login-page" && <Navbar />}
       <ProtectedRoute>{children}</ProtectedRoute>
     </AuthProvider>
   );

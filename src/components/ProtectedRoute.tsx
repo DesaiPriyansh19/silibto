@@ -1,22 +1,27 @@
 "use client";
 
 import { useAuth } from "@/context/AuthContext";
-import { usePathname, useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import { useEffect } from "react";
 
 export default function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { isAuthenticated, loading } = useAuth();
-  const pathname = usePathname();
   const router = useRouter();
+  const pathname = usePathname();
 
   useEffect(() => {
-    if (!loading && !isAuthenticated && pathname !== "/login-page") {
-      router.replace("/login-page");
+    if (!loading) {
+      if (!isAuthenticated && pathname !== "/login-page") {
+        router.replace("/login-page");
+      }
+      if (isAuthenticated && pathname === "/login-page") {
+        router.replace("/");
+      }
     }
   }, [isAuthenticated, loading, pathname, router]);
 
-  // Show nothing while loading auth
   if (loading) return null;
+  if (!isAuthenticated && pathname !== "/login-page") return null;
 
   return <>{children}</>;
 }

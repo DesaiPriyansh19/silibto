@@ -55,6 +55,18 @@ export default function Navbar() {
  const [activeLower, setActiveLower] = useState<string>("");
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [openSubMenu, setOpenSubMenu] = useState<string | null>(null);
+ const { user, selectedBranch } = useAuth(); // selectedBranch is already the object
+console.log("Selected Branch:", selectedBranch);
+console.log("Brand:", user?.brand?.name);
+
+// Brand name
+const brandName = user?.brand?.name ?? "Brand";
+
+// Branch name: if selectedBranch is an object, use its name
+const branchName = selectedBranch?.name ?? "Branch";
+
+console.log("Branch", branchName);
+console.log("Brand", brandName);
 const { logout } = useAuth();
 useEffect(() => {
   if (isSidebarOpen) {
@@ -150,21 +162,21 @@ useEffect(() => {
         </ul>
       </div>
 
-      {/* Right Side */}
+   {/* Right Side - Desktop */}
       <div className="w-[15%] flex-col hidden lg:flex">
         <div className="w-full h-[50%] bg-[#8BE497] text-black font-semibold text-center py-3">
-          Shreeji Opticals
+          {brandName}
         </div>
         <div className="w-full h-[50%] bg-[#5DD86E] text-black font-normal text-center py-2">
-          Vastrapur
+          {branchName}
         </div>
       </div>
 
       {/* Mobile / Tablet View */}
       <div className="flex lg:hidden w-[85%] text-lg sm:text-2xl text-center justify-between items-center px-4">
         <div className="flex flex-col items-center mx-auto">
-          <span className="font-semibold">Shreeji Opticals</span>
-          <span className="">Vastrapur</span>
+          <span className="font-semibold">{brandName}</span>
+          <span>{branchName}</span>
         </div>
         <button
           className="bg-[#8BE497] p-2 rounded"

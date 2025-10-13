@@ -1,42 +1,95 @@
 "use client";
 
-import { createContext, useContext, useState, useEffect } from "react";
+import { createContext, useContext, useState, useEffect, ReactNode } from "react";
 import { useRouter } from "next/navigation";
 
-type AuthContextType = {
+// Types
+interface Brand { id: string; name: string; description?: string; }
+interface Branch { id: string; name: string; location?: string; brand: Brand; }
+interface User { id: string; fullName?: string; email: string; role: string; brand: Brand; branches?: Branch[]; [key: string]: any; }
+
+interface AuthContextType {
+  user: User | null;
+  token: string | null;
+  selectedBranch: Branch | null;
   isAuthenticated: boolean;
-  login: () => void;
-  logout: () => void;
   loading: boolean;
-};
+  login: (payload: { user: User; token: string }) => void;
+  logout: () => void;
+  selectBranch: (branch: Branch) => void;
+}
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [loading, setLoading] = useState(true); // track initial load
+export const AuthProvider = ({ children }: { children: ReactNode }) => {
+  const [user, setUser] = useState<User | null>(null);
+  const [token, setToken] = useState<string | null>(null);
+  const [selectedBranch, setSelectedBranch] = useState<Branch | null>(null);
+  const [loading, setLoading] = useState(true);
   const router = useRouter();
 
+  // Load from localStorage
   useEffect(() => {
-    const auth = localStorage.getItem("auth");
-    if (auth === "true") setIsAuthenticated(true);
-    setLoading(false); // done checking auth
+    try {
+      const storedUser = localStorage.getItem("user");
+      const storedToken = localStorage.getItem("token");
+      const storedBranch = localStorage.getItem("selectedBranch");
+
+      if (storedUser) setUser(JSON.parse(storedUser));
+      if (storedToken) setToken(storedToken);
+      if (storedBranch) setSelectedBranch(JSON.parse(storedBranch));
+    } catch {
+      localStorage.removeItem("user");
+      localStorage.removeItem("token");
+      localStorage.removeItem("selectedBranch");
+      setUser(null);
+      setToken(null);
+      setSelectedBranch(null);
+    } finally {
+      setLoading(false);
+    }
   }, []);
 
-  const login = () => {
-    localStorage.setItem("auth", "true");
-    setIsAuthenticated(true);
-    router.push("/"); // redirect after login
+  const login = ({ user, token }: { user: User; token: string }) => {
+    setUser(user);
+    setToken(token);
+    localStorage.setItem("user", JSON.stringify(user));
+    localStorage.setItem("token", token);
+
+    // Admins go home immediately
+    if (user.role === "admin") {
+      router.replace("/");
+      return;
+    }
+
+    // Single branch user → auto-select
+    if (user.branches && user.branches.length === 1) {
+      selectBranch(user.branches[0]);
+    }
+
+    // Multi-branch → stay on login page for branch selection
+  };
+
+  const selectBranch = (branch: Branch) => {
+    setSelectedBranch(branch);
+    localStorage.setItem("selectedBranch", JSON.stringify(branch));
+    router.replace("/"); // redirect to home after selection
   };
 
   const logout = () => {
-    localStorage.removeItem("auth");
-    setIsAuthenticated(false);
-    router.push("/login-page");
+    setUser(null);
+    setToken(null);
+    setSelectedBranch(null);
+    localStorage.removeItem("user");
+    localStorage.removeItem("token");
+    localStorage.removeItem("selectedBranch");
+    router.replace("/login-page");
   };
 
+  const isAuthenticated = !!user && !!token && (user.role === "admin" || !!selectedBranch);
+
   return (
-    <AuthContext.Provider value={{ isAuthenticated, login, logout, loading }}>
+    <AuthContext.Provider value={{ user, token, selectedBranch, isAuthenticated, loading, login, logout, selectBranch }}>
       {children}
     </AuthContext.Provider>
   );

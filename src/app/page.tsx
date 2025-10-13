@@ -17,6 +17,7 @@ import DownArrow from "@/assets/icons/DownArrow.svg";
 import FileIcon from "@/assets/icons/FileIcon.svg";
 import PoIcon from "@/assets/icons/PoIcon.svg";
 import Link from "next/link";
+import { useAuth } from "@/context/AuthContext";
 const data = [
   { month: "Jan", sales: 10000 },
   { month: "Feb", sales: 20000 },
@@ -33,18 +34,24 @@ const operations = [
 
 
 export default function HomePage() {
+   const { user } = useAuth(); // selectedBranch is already the object
   return (
     <div className="p-4 md:p-6 space-y-8">
       {/* Top Bar */}
       <div className="flex flex-col md:flex-row items-center justify-between gap-4 border-[#fadada]">
         {/* Left - Logo + Welcome */}
-        <div className="hidden lg:static lg:flex items-center gap-2">
-          <Image src="/user-avatar.png" alt="Logo" width={40} height={40} />
-          <div>
-            <p className="text-sm font-bold">Welcome</p>
-            <p className="text-lg font-normal">Rina Patel</p>
-          </div>
-        </div>
+      <div className="hidden lg:static lg:flex items-center gap-[4px]">
+  <Image src="/user-avatar.png" alt="User Avatar" width={40} height={40} className="rounded-full" />
+  <div>
+    <p className="text-sm font-bold">Welcome</p>
+    <div className="flex justify-center items-center gap-[3px]">
+          <p className="text-lg font-normal">{user?.fullName ?? "User"}</p>
+    <p className="text-[.7rem] text-gray-700">({user?.role ?? "Role"})</p>
+    </div>
+
+  </div>
+</div>
+
 
         {/* Middle - Search */}
         <div className="flex items-center bg-white border-[2px]  border-[#E6E6E6] rounded-full px-3 py-2 w-full md:w-1/3">
