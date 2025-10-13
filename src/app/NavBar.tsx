@@ -21,6 +21,7 @@ const lowerNavItems: Record<string, string[]> = {
   Purchase: ["Purchase Item1", "Purchase Item2"],
   Stocks: ["Stocks Item1", "Stocks Item2"],
   ClientData: ["Add New Client"],
+ Users:['Manage Users',"Create Users" ,"Permissions"]
 };
 
 // Map each submenu item to a href
@@ -34,6 +35,8 @@ const lowerNavLinks: Record<string, string> = {
   "Stocks Item1": "",
   "Stocks Item2": "",
   "Add New Client": "/add-new-client",
+  "Manage Users": "/users-permissions/user-management",
+  "Permissions": "/users-permissions/permission-managment"
 };
 
 // Upper nav items
@@ -47,7 +50,7 @@ const upperNavItems: string[] = [
   "Accounts",
   "Calendar",
   "Report",
-  "User",
+  "Users",
 ];
 
 export default function Navbar() {
