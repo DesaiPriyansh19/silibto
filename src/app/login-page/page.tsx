@@ -36,6 +36,8 @@ export default function LoginPage() {
   }, [isAuthenticated, user, router, selectBranch]);
 
   const handleLogin = async (e: React.FormEvent) => {
+    console.log("Backend URL:", process.env.NEXT_PUBLIC_SERVER_URL);
+
     e.preventDefault();
     if (!userId || !password) {
       toast.error("Please enter both User ID and Password");
