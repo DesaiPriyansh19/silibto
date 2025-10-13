@@ -64,6 +64,7 @@ console.log("Backend URL:", process.env.NEXT_PUBLIC_SERVER_URL);
 
       toast.success("Login successful!");
     } catch (err: any) {
+      console.log("Backend URL:", process.env.NEXT_PUBLIC_SERVER_URL);
       toast.error(err.message || "Login failed");
     } finally {
       setLoading(false);
