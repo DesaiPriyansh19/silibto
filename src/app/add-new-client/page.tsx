@@ -42,13 +42,20 @@ export default function AddNewClient() {
       .catch((err) => console.error("Error fetching family groups", err));
   }, [token]);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    const { name, value, type, checked } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: type === "checkbox" ? checked : value,
-    }));
-  };
+const handleChange = (
+  e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+) => {
+  const { name, value, type } = e.target;
+
+  setFormData((prev) => ({
+    ...prev,
+    [name]:
+      type === "checkbox" && e.target instanceof HTMLInputElement
+        ? e.target.checked
+        : value,
+  }));
+};
+
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
