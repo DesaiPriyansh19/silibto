@@ -7,8 +7,10 @@ import toast, { Toaster } from "react-hot-toast";
 
 interface FamilyGroup {
   id: string;
-  name: string;
+  headName: string;   // ✅ correct field name from Payload
+  reference?: string; // optional
 }
+
 
 export default function AddNewClient() {
   const { token } = useAuth();
@@ -162,11 +164,12 @@ export default function AddNewClient() {
       <div className="flex flex-row gap-3 mt-4 lg:items-center">
         <select name="familyGroupId" value={formData.familyGroupId} onChange={handleChange} className="flex-1 border-[2px] border-gray-300 rounded-lg px-3 py-2 outline-none">
           <option value="">Select Family Group</option>
-          {familyGroups.map((fg) => (
-            <option key={fg.id} value={fg.id}>
-              {fg.name}
-            </option>
-          ))}
+  {familyGroups.map((fg) => (
+  <option key={fg.id} value={fg.id}>
+    {fg.headName}
+  </option>
+))}
+
         </select>
       </div>
 
