@@ -37,6 +37,54 @@ export default function UserManagement() {
       mobile: "9876543210",
       isActive: false,
     },
+     {
+      id: 3,
+      name: "John Doe",
+      role: "Admin",
+      branches: ["Mumbai", "Ahmedabad"],
+      mobile: "1234567890",
+      isActive: true,
+    },
+    {
+      id: 3,
+      name: "Jane Smith",
+      role: "Employee",
+      branches: ["Delhi"],
+      mobile: "9876543210",
+      isActive: false,
+    },
+     {
+      id: 4,
+      name: "John Doe",
+      role: "Admin",
+      branches: ["Mumbai", "Ahmedabad"],
+      mobile: "1234567890",
+      isActive: true,
+    },
+    {
+      id: 5,
+      name: "Jane Smith",
+      role: "Employee",
+      branches: ["Delhi"],
+      mobile: "9876543210",
+      isActive: false,
+    },
+     {
+      id: 6,
+      name: "John Doe",
+      role: "Admin",
+      branches: ["Mumbai", "Ahmedabad"],
+      mobile: "1234567890",
+      isActive: true,
+    },
+    {
+      id: 7,
+      name: "Jane Smith",
+      role: "Employee",
+      branches: ["Delhi"],
+      mobile: "9876543210",
+      isActive: false,
+    },
   ]);
 
   const permissionsData: PermissionSection[] = [
@@ -48,6 +96,7 @@ export default function UserManagement() {
       heading: "Ac Page",
       permissions: ["View", "Edit", "Delete"],
     },
+    
   ];
 
   const handleCheckboxChange = (userId: number, perm: string) => {
@@ -97,7 +146,7 @@ export default function UserManagement() {
           <tbody className="divide-y divide-gray-100 text-sm xl:text-lg">
             {users.map((user) => (
               <>
-                <tr key={user.id}>
+                <tr key={user.id} className="shadow1">
                   <td className="px-4 py-2">{user.name}</td>
                   <td className="px-4 py-2">{user.role}</td>
                   <td className="px-4 py-2">{user.branches.join(", ")}</td>
