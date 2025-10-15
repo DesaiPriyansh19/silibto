@@ -65,10 +65,14 @@ const router = useRouter();
         setUsers(usersData);
 
         // Extract dynamic roles and branches
-        const rolesSet = new Set(usersData.map((u: User) => u.role));
-        setRoles(Array.from(rolesSet));
-        const branchesSet = new Set(usersData.flatMap((u: User) => u.branches?.map((b) => b.name) || []));
-        setBranches(Array.from(branchesSet));
+const rolesSet = new Set(usersData.map((u: User) => u.role));
+setRoles(Array.from(rolesSet) as string[]);
+
+const branchesSet = new Set(
+  usersData.flatMap((u: User) => u.branches?.map((b) => b.name) || [])
+);
+setBranches(Array.from(branchesSet) as string[]);
+
 
       } catch (err) {
         console.error(err);
