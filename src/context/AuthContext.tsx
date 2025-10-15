@@ -4,7 +4,7 @@ import { createContext, useContext, useState, useEffect, ReactNode } from "react
 import { useRouter } from "next/navigation";
 
 // Types
-interface Brand { id: string; name: string; description?: string; }
+interface Brand { id: string; name: string; description?: string;  }
 interface Branch { id: string; name: string; location?: string; brand: Brand; }
 interface User { id: string; fullName?: string; email: string; role: string; brand: Brand; branches?: Branch[]; [key: string]: any; }
 

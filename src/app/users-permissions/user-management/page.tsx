@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { FiChevronDown, FiChevronUp } from "react-icons/fi";
+
 
 type User = {
   id: number;
@@ -12,14 +12,10 @@ type User = {
   isActive: boolean;
 };
 
-type PermissionSection = {
-  heading: string;
-  permissions: string[];
-};
+
 
 export default function UserManagement() {
-  const [expandedPermissions, setExpandedPermissions] = useState<number | null>(null);
-  const [checkedPermissions, setCheckedPermissions] = useState<{ [key: string]: boolean }>({});
+
   const [users, setUsers] = useState<User[]>([
     {
       id: 1,
@@ -87,22 +83,9 @@ export default function UserManagement() {
     },
   ]);
 
-  const permissionsData: PermissionSection[] = [
-    {
-      heading: "Home Page",
-      permissions: ["Chart View", "Chart Edit", "Chart Delete", "PO View", "PO Edit", "PO Delete"],
-    },
-    {
-      heading: "Ac Page",
-      permissions: ["View", "Edit", "Delete"],
-    },
-    
-  ];
 
-  const handleCheckboxChange = (userId: number, perm: string) => {
-    const key = `${userId}-${perm}`;
-    setCheckedPermissions((prev) => ({ ...prev, [key]: !prev[key] }));
-  };
+
+
 
   const toggleUserStatus = (userId: number) => {
     setUsers((prev) =>
@@ -138,9 +121,9 @@ export default function UserManagement() {
               <th className="px-4 py-2 text-left">Role</th>
               <th className="px-4 py-2 text-left">Branches</th>
               <th className="px-4 py-2 text-left">Mobile</th>
-              <th className="px-4 py-2 text-left">Permissions</th>
+                          <th className="px-4 py-2 text-left">Status</th>
               <th className="px-4 py-2 text-left">Manage</th>
-              <th className="px-4 py-2 text-left">Status</th>
+
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-100 text-sm xl:text-lg">
@@ -150,22 +133,7 @@ export default function UserManagement() {
                   <td className="px-4 py-2">{user.name}</td>
                   <td className="px-4 py-2">{user.role}</td>
                   <td className="px-4 py-2">{user.branches.join(", ")}</td>
-                  <td className="px-4 py-2">{user.mobile}</td>
-                  <td className="px-4 py-2">
-                    <button
-                      className="flex items-center gap-1 px-2 py-1 border-[2px] border-gray-300 rounded-lg "
-                      onClick={() =>
-                        setExpandedPermissions(
-                          expandedPermissions === user.id ? null : user.id
-                        )
-                      }
-                    >
-                      view {expandedPermissions === user.id ? <FiChevronUp /> : <FiChevronDown />}
-                    </button>
-                  </td>
-                  <td className="px-4 py-2">
-                    <button className="bg-[#8BE497] hover:scale-95 text-black px-3 py-1 rounded-lg">manage</button>
-                  </td>
+                  <td className="px-4 py-2">{user.mobile}</td>   
              <td className="px-4 py-2">
   <label className="relative inline-flex items-center cursor-pointer">
     <input
@@ -180,38 +148,11 @@ export default function UserManagement() {
     </span>
   </label>
 </td>
-
+    <td className="px-4 py-2">
+                    <button className="bg-[#8BE497] hover:scale-95 text-black px-3 py-1 rounded-lg">manage</button>
+                  </td>
                 </tr>
 
-                {expandedPermissions === user.id && (
-                  <tr key={`perm-${user.id}`} className="bg-gray-50">
-                    <td colSpan={7} className="p-4">
-                      {permissionsData.map((section, idx) => (
-                        <div key={idx} className="mb-3">
-                          <h4 className="font-semibold mb-2">{section.heading}</h4>
-                          <div className="flex flex-wrap gap-3">
-                            {section.permissions.map((perm, i) => {
-                              const key = `${user.id}-${perm}`;
-                              return (
-                                <label
-                                  key={i}
-                                  className="flex items-center gap-1 bg-gray-200 px-2 py-1 rounded text-sm"
-                                >
-                                  <input
-                                    type="checkbox"
-                                    checked={!!checkedPermissions[key]}
-                                    onChange={() => handleCheckboxChange(user.id, perm)}
-                                  />
-                                  {perm}
-                                </label>
-                              );
-                            })}
-                          </div>
-                        </div>
-                      ))}
-                    </td>
-                  </tr>
-                )}
               </>
             ))}
           </tbody>

@@ -7,12 +7,18 @@ import { useRouter } from "next/navigation";
 import toast, { Toaster } from "react-hot-toast";
 import { useAuth } from "@/context/AuthContext";
 
+interface Brand { id: string; name: string; description?: string }
+interface Branch { id: string; name: string; location?: string; brand: Brand }
+
+
+
+
 export default function LoginPage() {
   const { user, login, selectBranch, isAuthenticated } = useAuth();
   const [userId, setUserId] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
-  const [branches, setBranches] = useState<any[]>([]);
+const [branches, setBranches] = useState<Branch[]>([]);
   const [selectedBranch, setSelectedBranch] = useState("");
 
   const router = useRouter();
@@ -45,45 +51,57 @@ console.log("Backend URL:", process.env.NEXT_PUBLIC_SERVER_URL);
     }
 
     setLoading(true);
-    try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/users/login`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: userId, password }),
-      });
+try {
+  const res = await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/users/login`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ email: userId, password }),
+  });
 
-      if (!res.ok) throw new Error("Invalid credentials");
-      const data = await res.json();
+  const data = await res.json();
 
-      login({ user: data.user, token: data.token });
+  if (!res.ok) {
+    // 👇 Show exact backend error like inactive status
+    throw new Error(data.errors?.[0]?.message || "Invalid credentials");
+  }
 
-      // Multi-branch → show selection
-      if (data.user.role !== "admin" && data.user.branches?.length > 1) {
-        setBranches(data.user.branches);
-      }
+  login({ user: data.user, token: data.token });
 
-      toast.success("Login successful!");
-    } catch (err: any) {
-      console.log("Backend URL:", process.env.NEXT_PUBLIC_SERVER_URL);
-      toast.error(err.message || "Login failed");
-    } finally {
-      setLoading(false);
-    }
+  if (data.user.role !== "admin" && data.user.branches?.length > 1) {
+    setBranches(data.user.branches);
+  }
+
+  toast.success("Login successful!");
+}  catch (err: unknown) {
+  if (err instanceof Error) {
+    toast.error(err.message);
+  } else {
+    toast.error("Login failed");
+  }
+}
+finally {
+  setLoading(false);
+}
+
   };
 
-  const handleBranchSelect = () => {
-    if (!selectedBranch) {
-      toast.error("Please select a branch");
-      return;
-    }
-    const branchObj = branches.find((b) => b.id === selectedBranch);
-    if (!branchObj) {
-      toast.error("Invalid branch selected");
-      return;
-    }
-    selectBranch(branchObj); // Context handles redirect
-    toast.success("Branch selected. Redirecting...");
-  };
+const handleBranchSelect = () => {
+  if (!selectedBranch) {
+    toast.error("Please select a branch");
+    return;
+  }
+
+  const branchObj = branches.find((b) => b.id === selectedBranch);
+
+  if (!branchObj) {
+    toast.error("Invalid branch selected");
+    return;
+  }
+
+  selectBranch(branchObj); // now TypeScript knows branchObj is definitely Branch
+  toast.success("Branch selected. Redirecting...");
+};
+
 
   return (
     <div className="flex flex-col md:flex-row h-screen w-full bg-white">
