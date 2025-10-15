@@ -73,7 +73,8 @@ export default function CreateUserForm() {
           role: formData.role,
           status: formData.status,
           branches: formData.branch ? [formData.branch] : [],
-          brand: user.brand.id,
+    brand: user?.brand?.id || "",
+
         }),
       });
 
