@@ -6,6 +6,7 @@ import { FiArrowRight } from "react-icons/fi";
 import { useRouter } from "next/navigation";
 import toast, { Toaster } from "react-hot-toast";
 import { useAuth } from "@/context/AuthContext";
+import Loading from "@/components/Loading";
 
 interface Brand { id: string; name: string; description?: string }
 interface Branch { id: string; name: string; location?: string; brand: Brand }
@@ -105,6 +106,7 @@ const handleBranchSelect = () => {
 
   return (
     <div className="flex flex-col md:flex-row h-screen w-full bg-white">
+       {loading && <Loading message="Logging in..." />} {/* Show loader overlay when loading */}
       <Toaster position="top-right" />
 
       {/* Left - Logo */}

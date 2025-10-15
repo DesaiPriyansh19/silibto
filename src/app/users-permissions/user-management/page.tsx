@@ -193,54 +193,60 @@ setBranches(Array.from(branchesSet) as string[]);
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-100 text-sm xl:text-lg">
-            {loading
-              ? Array.from({ length: 5 }).map((_, idx) => (
-                  <tr key={idx} className="animate-pulse">
-                    <td className="px-4 py-2 bg-gray-200 h-6 rounded"></td>
-                    <td className="px-4 py-2 bg-gray-200 h-6 rounded"></td>
-                    <td className="px-4 py-2 bg-gray-200 h-6 rounded"></td>
-                    <td className="px-4 py-2 bg-gray-200 h-6 rounded"></td>
-                    <td className="px-4 py-2 bg-gray-200 h-6 rounded"></td>
-                    <td className="px-4 py-2 bg-gray-200 h-6 rounded"></td>
-                  </tr>
-                ))
-              : filteredUsers.map((user) => (
-                  <tr key={user.id}>
-                    <td className="px-4 py-2">{user.fullName}</td>
-                    <td className="px-4 py-2 capitalize">{user.role}</td>
-                    <td className="px-4 py-2">{user.branches?.map((b) => b.name).join(", ")}</td>
-                    <td className="px-4 py-2">{user.mobileNumber}</td>
-                    {/* Status toggle */}
-               {/* Status toggle */}
-<td className="px-4 py-2">
-  <button
-    className={`
-      relative w-12 h-6 rounded-full transition-all
-      ${user.status === "active" ? "bg-green-500" : "bg-red-500"}
-      ${updatingStatus.includes(user.id) ? "opacity-60 cursor-not-allowed" : ""}
-    `}
-    onClick={() => toggleUserStatus(user.id, user.status || "inactive")}
-    disabled={updatingStatus.includes(user.id)}
-  >
-    <span
-      className={`
-        absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow-md transition-all
-        ${user.status === "active" ? "translate-x-6" : "translate-x-0"}
-      `}
-    />
-  </button>
-</td>
+       {loading ? (
+  // Skeleton Loader (Table Rows)
+  Array.from({ length: 6 }).map((_, idx) => (
+    <tr key={idx} className="animate-pulse">
+      {Array.from({ length: 6 }).map((__, colIdx) => (
+        <td key={colIdx} className="px-4 py-3">
+          <div className="relative overflow-hidden rounded-md bg-gray-200 h-5 w-full">
+            <div className="absolute inset-0 -translate-x-full animate-[shimmer_1.5s_infinite] bg-gradient-to-r from-transparent via-white/50 to-transparent"></div>
+          </div>
+        </td>
+      ))}
+    </tr>
+  ))
+) : (
+  // Actual data rows
+  filteredUsers.map((user) => (
+    <tr key={user.id} className="hover:bg-gray-50 transition">
+      <td className="px-4 py-2">{user.fullName}</td>
+      <td className="px-4 py-2 capitalize">{user.role}</td>
+      <td className="px-4 py-2">{user.branches?.map((b) => b.name).join(", ")}</td>
+      <td className="px-4 py-2">{user.mobileNumber}</td>
 
-                    <td className="px-4 py-2">
-                   <button
-  className="bg-[#8BE497] hover:scale-95 text-black px-3 py-1 rounded-lg"
-  onClick={() => router.push(`/users-permissions/user-details/${user.id}`)}
->
-  Manage
-</button>
-                    </td>
-                  </tr>
-                ))}
+      {/* Status toggle */}
+      <td className="px-4 py-2">
+        <button
+          className={`
+            relative w-12 h-6 rounded-full transition-all
+            ${user.status === "active" ? "bg-green-500" : "bg-red-500"}
+            ${updatingStatus.includes(user.id) ? "opacity-60 cursor-not-allowed" : ""}
+          `}
+          onClick={() => toggleUserStatus(user.id, user.status || "inactive")}
+          disabled={updatingStatus.includes(user.id)}
+        >
+          <span
+            className={`
+              absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow-md transition-all
+              ${user.status === "active" ? "translate-x-6" : "translate-x-0"}
+            `}
+          />
+        </button>
+      </td>
+
+      <td className="px-4 py-2">
+        <button
+          className="bg-[#8BE497] hover:scale-95 text-black px-3 py-1 rounded-lg transition"
+          onClick={() => router.push(`/users-permissions/user-details/${user.id}`)}
+        >
+          Manage
+        </button>
+      </td>
+    </tr>
+  ))
+)}
+
           </tbody>
         </table>
       </div>
