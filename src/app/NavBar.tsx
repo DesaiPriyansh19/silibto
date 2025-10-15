@@ -21,7 +21,7 @@ const lowerNavItems: Record<string, string[]> = {
   Purchase: ["Purchase Item1", "Purchase Item2"],
   Stocks: ["Stocks Item1", "Stocks Item2"],
   ClientData: ["Add New Client","Add Family Group"],
- Users:['Manage Users',"Create Users" ,"Permissions"]
+ Users:['Manage Users',"Create Users" ]
 };
 
 // Map each submenu item to a href
@@ -37,7 +37,8 @@ const lowerNavLinks: Record<string, string> = {
   "Add New Client": "/add-new-client",
   "Add Family Group" :"/create-family-group",
   "Manage Users": "/users-permissions/user-management",
-  "Permissions": "/users-permissions/permission-managment"
+  "Create Users":"/users-permissions/create-user",
+
 };
 
 // Upper nav items

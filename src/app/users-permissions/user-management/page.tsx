@@ -1,118 +1,181 @@
 "use client";
 
-import { useState } from "react";
-
-
-type User = {
-  id: number;
+import React, { useState, useEffect } from "react";
+import toast, { Toaster } from "react-hot-toast";
+import { useAuth } from "@/context/AuthContext";
+import { useRouter } from "next/navigation";
+// Interfaces
+interface Brand {
+  id: string;
   name: string;
+  description?: string;
+}
+
+interface Branch {
+  id: string;
+  name: string;
+  location?: string;
+  brand: Brand;
+}
+
+interface User {
+  id: string;
+  fullName?: string;
   role: string;
-  branches: string[];
-  mobile: string;
-  isActive: boolean;
-};
-
-
+  branches?: Branch[];
+  mobileNumber?: string;
+  status?: "active" | "inactive";
+}
 
 export default function UserManagement() {
+  const { token, user } = useAuth();
+  const [users, setUsers] = useState<User[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [updatingStatus, setUpdatingStatus] = useState<string[]>([]);
+const router = useRouter();
+  // Filters
+  const [search, setSearch] = useState("");
+  const [roleFilter, setRoleFilter] = useState("");
+  const [branchFilter, setBranchFilter] = useState("");
+  const [statusFilter, setStatusFilter] = useState("");
 
-  const [users, setUsers] = useState<User[]>([
-    {
-      id: 1,
-      name: "John Doe",
-      role: "Admin",
-      branches: ["Mumbai", "Ahmedabad"],
-      mobile: "1234567890",
-      isActive: true,
-    },
-    {
-      id: 2,
-      name: "Jane Smith",
-      role: "Employee",
-      branches: ["Delhi"],
-      mobile: "9876543210",
-      isActive: false,
-    },
-     {
-      id: 3,
-      name: "John Doe",
-      role: "Admin",
-      branches: ["Mumbai", "Ahmedabad"],
-      mobile: "1234567890",
-      isActive: true,
-    },
-    {
-      id: 3,
-      name: "Jane Smith",
-      role: "Employee",
-      branches: ["Delhi"],
-      mobile: "9876543210",
-      isActive: false,
-    },
-     {
-      id: 4,
-      name: "John Doe",
-      role: "Admin",
-      branches: ["Mumbai", "Ahmedabad"],
-      mobile: "1234567890",
-      isActive: true,
-    },
-    {
-      id: 5,
-      name: "Jane Smith",
-      role: "Employee",
-      branches: ["Delhi"],
-      mobile: "9876543210",
-      isActive: false,
-    },
-     {
-      id: 6,
-      name: "John Doe",
-      role: "Admin",
-      branches: ["Mumbai", "Ahmedabad"],
-      mobile: "1234567890",
-      isActive: true,
-    },
-    {
-      id: 7,
-      name: "Jane Smith",
-      role: "Employee",
-      branches: ["Delhi"],
-      mobile: "9876543210",
-      isActive: false,
-    },
-  ]);
+  // Dynamic filter options
+  const [roles, setRoles] = useState<string[]>([]);
+  const [branches, setBranches] = useState<string[]>([]);
 
+  // Fetch users
+  useEffect(() => {
+    if (!token) return;
 
+    const fetchUsers = async () => {
+      setLoading(true);
+      try {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/users`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        const data = await res.json();
+        if (!res.ok) {
+          console.error("Error fetching users:", data);
+          toast.error(data.errors?.[0]?.message || "Cannot fetch users. You might not have permission.");
+          setUsers([]);
+          return;
+        }
 
+        const usersData = data.docs || data;
+        setUsers(usersData);
 
+        // Extract dynamic roles and branches
+        const rolesSet = new Set(usersData.map((u: User) => u.role));
+        setRoles(Array.from(rolesSet));
+        const branchesSet = new Set(usersData.flatMap((u: User) => u.branches?.map((b) => b.name) || []));
+        setBranches(Array.from(branchesSet));
 
-  const toggleUserStatus = (userId: number) => {
-    setUsers((prev) =>
-      prev.map((u) => (u.id === userId ? { ...u, isActive: !u.isActive } : u))
-    );
+      } catch (err) {
+        console.error(err);
+        toast.error("Error fetching users");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (user?.role === "admin") fetchUsers();
+    else {
+      toast.error("You do not have permission to view users");
+      setLoading(false);
+    }
+  }, [token, user]);
+
+  // Toggle user status
+  const toggleUserStatus = async (userId: string, currentStatus: "active" | "inactive") => {
+    setUpdatingStatus((prev) => [...prev, userId]);
+
+    try {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/users/${userId}`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ status: currentStatus === "active" ? "inactive" : "active" }),
+      });
+
+      const data = await res.json();
+      if (!res.ok) {
+        console.error("Error updating status:", data);
+        toast.error(data.errors?.[0]?.message || "Failed to update status");
+        return;
+      }
+
+      setUsers((prev) =>
+        prev.map((u) =>
+          u.id === userId ? { ...u, status: currentStatus === "active" ? "inactive" : "active" } : u
+        )
+      );
+    } catch (err) {
+      console.error("Error updating status:", err);
+      toast.error("Error updating status");
+    } finally {
+      setUpdatingStatus((prev) => prev.filter((id) => id !== userId));
+    }
   };
+
+  // Filter users
+  const filteredUsers = users.filter((u) => {
+    const name = u.fullName || "";
+    const mobile = u.mobileNumber || "";
+    const matchesSearch = name.toLowerCase().includes(search.toLowerCase()) || mobile.toLowerCase().includes(search.toLowerCase());
+    const matchesRole = roleFilter ? u.role === roleFilter : true;
+    const matchesBranch = branchFilter ? u.branches?.some((b) => b.name === branchFilter) : true;
+    const matchesStatus = statusFilter ? u.status === statusFilter : true;
+    return matchesSearch && matchesRole && matchesBranch && matchesStatus;
+  });
 
   return (
     <div className="p-6 bg-white min-h-screen">
-      {/* Search & Filters */}
+      <Toaster position="top-right" />
+      <h2 className="text-xl font-semibold mb-4">User Management</h2>
+
+      {/* Filters */}
       <div className="flex flex-wrap gap-3 mb-6 items-end text-sm">
-        <input type="text" placeholder="Search Users..." className="border-[2px]   border-gray-300 rounded-lg text-black p-2 flex-1" />
-        <select className="border-[2px] border-gray-300 rounded-lg p-2">
-          <option>All Roles</option>
-          <option>Admin</option>
-          <option>Employee</option>
+        <input
+          type="text"
+          placeholder="Search by Name or Mobile..."
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          className="border-[2px] border-gray-300 rounded-lg text-black p-2 flex-1"
+        />
+        <select
+          value={roleFilter}
+          onChange={(e) => setRoleFilter(e.target.value)}
+          className="border-[2px] border-gray-300 rounded-lg p-2"
+        >
+          <option value="">All Roles</option>
+          {roles.map((r) => (
+            <option key={r} value={r}>{r}</option>
+          ))}
         </select>
-        <select className="border-[2px] border-gray-300 rounded-lg p-2">
-          <option>All Branches</option>
-          <option>Mumbai</option>
-          <option>Ahmedabad</option>
-          <option>Delhi</option>
+        <select
+          value={branchFilter}
+          onChange={(e) => setBranchFilter(e.target.value)}
+          className="border-[2px] border-gray-300 rounded-lg p-2"
+        >
+          <option value="">All Branches</option>
+          {branches.map((b) => (
+            <option key={b} value={b}>{b}</option>
+          ))}
         </select>
-        <button className="bg-[#8BE497] hover:scale-95 text-black px-5 py-2 rounded-md">Search</button>
+        <select
+          value={statusFilter}
+          onChange={(e) => setStatusFilter(e.target.value)}
+          className="border-[2px] border-gray-300 rounded-lg p-2"
+        >
+          <option value="">All Status</option>
+          <option value="active">Active</option>
+          <option value="inactive">Inactive</option>
+        </select>
       </div>
 
-      {/* Users Table */}
+      {/* Table */}
       <div className="overflow-x-auto border-[2px] border-gray-300 rounded-lg">
         <table className="min-w-full divide-y divide-gray-200">
           <thead className="bg-gray-50">
@@ -121,40 +184,59 @@ export default function UserManagement() {
               <th className="px-4 py-2 text-left">Role</th>
               <th className="px-4 py-2 text-left">Branches</th>
               <th className="px-4 py-2 text-left">Mobile</th>
-                          <th className="px-4 py-2 text-left">Status</th>
+              <th className="px-4 py-2 text-left">Status</th>
               <th className="px-4 py-2 text-left">Manage</th>
-
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-100 text-sm xl:text-lg">
-            {users.map((user) => (
-              <>
-                <tr key={user.id} className="shadow1">
-                  <td className="px-4 py-2">{user.name}</td>
-                  <td className="px-4 py-2">{user.role}</td>
-                  <td className="px-4 py-2">{user.branches.join(", ")}</td>
-                  <td className="px-4 py-2">{user.mobile}</td>   
-             <td className="px-4 py-2">
-  <label className="relative inline-flex items-center cursor-pointer">
-    <input
-      type="checkbox"
-      className="sr-only peer"
-      checked={user.isActive}
-      onChange={() => toggleUserStatus(user.id)}
+            {loading
+              ? Array.from({ length: 5 }).map((_, idx) => (
+                  <tr key={idx} className="animate-pulse">
+                    <td className="px-4 py-2 bg-gray-200 h-6 rounded"></td>
+                    <td className="px-4 py-2 bg-gray-200 h-6 rounded"></td>
+                    <td className="px-4 py-2 bg-gray-200 h-6 rounded"></td>
+                    <td className="px-4 py-2 bg-gray-200 h-6 rounded"></td>
+                    <td className="px-4 py-2 bg-gray-200 h-6 rounded"></td>
+                    <td className="px-4 py-2 bg-gray-200 h-6 rounded"></td>
+                  </tr>
+                ))
+              : filteredUsers.map((user) => (
+                  <tr key={user.id}>
+                    <td className="px-4 py-2">{user.fullName}</td>
+                    <td className="px-4 py-2 capitalize">{user.role}</td>
+                    <td className="px-4 py-2">{user.branches?.map((b) => b.name).join(", ")}</td>
+                    <td className="px-4 py-2">{user.mobileNumber}</td>
+                    {/* Status toggle */}
+               {/* Status toggle */}
+<td className="px-4 py-2">
+  <button
+    className={`
+      relative w-12 h-6 rounded-full transition-all
+      ${user.status === "active" ? "bg-green-500" : "bg-red-500"}
+      ${updatingStatus.includes(user.id) ? "opacity-60 cursor-not-allowed" : ""}
+    `}
+    onClick={() => toggleUserStatus(user.id, user.status || "inactive")}
+    disabled={updatingStatus.includes(user.id)}
+  >
+    <span
+      className={`
+        absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow-md transition-all
+        ${user.status === "active" ? "translate-x-6" : "translate-x-0"}
+      `}
     />
-    <div className="w-8 h-6  peer-focus:outline-none  rounded-full border-[2px] border-gray-300 peer hover:scale-95  bg-red-300 peer-checked:bg-green-300 transition-all duration-300"></div>
-    <span className="ml-3 text-sm font-medium text-gray-900">
-      {user.isActive ? "active" : "inactive"}
-    </span>
-  </label>
+  </button>
 </td>
-    <td className="px-4 py-2">
-                    <button className="bg-[#8BE497] hover:scale-95 text-black px-3 py-1 rounded-lg">manage</button>
-                  </td>
-                </tr>
 
-              </>
-            ))}
+                    <td className="px-4 py-2">
+                   <button
+  className="bg-[#8BE497] hover:scale-95 text-black px-3 py-1 rounded-lg"
+  onClick={() => router.push(`/users-permissions/user-details/${user.id}`)}
+>
+  Manage
+</button>
+                    </td>
+                  </tr>
+                ))}
           </tbody>
         </table>
       </div>
