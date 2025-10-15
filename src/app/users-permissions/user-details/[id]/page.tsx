@@ -2,7 +2,7 @@
 
 import React from "react";
 import { useParams, useRouter } from "next/navigation";
-import UserDetails from "./user/page";
+import UserDetails from "@/components/UserDetails";
 
 
 export default function UserDetailsPage() {
