@@ -20,7 +20,7 @@ const lowerNavItems: Record<string, string[]> = {
   Sales: ["New Lead", "New Inquiry", "Pending Inquiry"],
   Purchase: ["Purchase Item1", "Purchase Item2"],
   Stocks: ["Stocks Item1", "Stocks Item2"],
-  ClientData: ["Add New Client","Add Family Group"],
+  ClientData: ["Add New Client","Add Family Group","Clients List"],
  Users:['Manage Users',"Create Users" ]
 };
 
@@ -34,7 +34,8 @@ const lowerNavLinks: Record<string, string> = {
   "Purchase Item2": "",
   "Stocks Item1": "",
   "Stocks Item2": "",
-  "Add New Client": "/add-new-client",
+  "Add New Client": "/clients/add-new-client",
+  "Clients List":"/clients/client-list",
   "Add Family Group" :"/create-family-group",
   "Manage Users": "/users-permissions/user-management",
   "Create Users":"/users-permissions/create-user",

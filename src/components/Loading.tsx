@@ -13,9 +13,9 @@ const Loading: React.FC<LoadingProps> = ({ message = "Loading..." }) => {
         src="https://lottie.host/cf9b2982-bfdd-4ed2-ba55-a57e4b2d3eab/ofpk8OvmyH.lottie"
         loop
         autoplay
-        style={{ width: "180px", height: "180px" }}
+        style={{ width: "200px", height: "200px" }}
       />
-      <p className="mt-4 text-gray-700 text-lg font-medium animate-pulse">
+      <p className="mt-0 text-black text-lg font-light animate-pulse">
         {message}
       </p>
     </div>

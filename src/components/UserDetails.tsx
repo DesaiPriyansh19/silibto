@@ -190,7 +190,7 @@ if (!user)
       </div>
 
       {/* Message */}
-      <h2 className="text-xl font-semibold text-gray-800 animate-pulse">User Not Found</h2>
+      <h2 className="text-xl font-semibold text-gray-800 ">User Not Found</h2>
       <p className="text-gray-600">
         We couldn’t find the user you’re looking for. They may have been removed or don’t exist.
       </p>
@@ -198,7 +198,7 @@ if (!user)
       {/* Action */}
       <button
         onClick={() => window.history.back()}
-        className="bg-green-500 hover:bg-green-600 text-white px-5 py-2 rounded-lg transition-transform hover:scale-95"
+        className="bg-[#5DD86E] hover:scale-95 text-sm text-black px-5 py-2 rounded-lg transition-transform "
       >
         Go Back
       </button>

@@ -4,6 +4,7 @@ import React, { useState, FormEvent } from "react";
 import { FiX } from "react-icons/fi";
 import toast, { Toaster } from "react-hot-toast";
 import { useAuth } from "@/context/AuthContext";
+import Loading from "@/components/Loading";
 
 export default function CreateFamilyGroup() {
   const { token } = useAuth();
@@ -72,6 +73,7 @@ const res = await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/family-groups
 
   return (
     <form onSubmit={handleSubmit} className="px-6 py-6 bg-white rounded-lg w-full max-w-md mx-auto">
+
       <Toaster position="top-right" />
       <h2 className="text-xl font-semibold text-center my-5">Create Family Group</h2>
 
