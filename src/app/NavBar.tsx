@@ -1,4 +1,4 @@
-"use client";
+
 "use client";
 import { useAuth } from "@/context/AuthContext";
 import { useEffect } from "react";
@@ -13,7 +13,7 @@ import {
 import { FiBell, FiSettings } from "react-icons/fi";
 import Link from "next/link";
 import Home from "@/assets/icons/Home.svg";
-
+import { useRouter } from "next/navigation";
 // Define lower nav structure
 const lowerNavItems: Record<string, string[]> = {
   Product:["Product Master"],
@@ -61,6 +61,7 @@ export default function Navbar() {
  const [activeLower, setActiveLower] = useState<string>("");
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [openSubMenu, setOpenSubMenu] = useState<string | null>(null);
+   const router = useRouter(); // inside the component
  const { user, selectedBranch } = useAuth(); // selectedBranch is already the object
 console.log("Selected Branch:", selectedBranch);
 console.log("Brand:", user?.brand?.name);
@@ -147,25 +148,27 @@ useEffect(() => {
         <ul className="flex bg-[#F2F2F2] h-[50%] pl-2">
           {(lowerNavItems[activeUpper] ?? []).map((item) => {
             const href = lowerNavLinks[item];
-            return (
-              // inside lower nav rendering
-        
-<li
-  key={item}
-  onClick={() => setActiveLower(`${activeUpper}|${item}`)}
-  className={`py-1  my-1 rounded-lg px-4 cursor-pointer ${
-    activeLower === `${activeUpper}|${item}`
-      ? "bg-white text-black"
-      : "text-gray-800"
-  }`}
->
-  {href ? <Link href={href}>{item}</Link> : item}
-</li>
-           
-          );
-          })}
+   return (
+          <li
+            key={item}
+            onClick={() => {
+              setActiveLower(`${activeUpper}|${item}`);
+              if (href) router.push(href); // works now
+            }}
+            className={`flex items-center justify-center font-normal text-sm xl:text-[1rem] my-1 rounded-lg px-4 cursor-pointer ${
+              activeLower === `${activeUpper}|${item}`
+                ? "bg-white text-black"
+                : "text-gray-700"
+            }`}
+          >
+            {item}
+          </li>
+        );
+      })}
+    </ul>
+
   
-        </ul>
+
       </div>
 
    {/* Right Side - Desktop */}

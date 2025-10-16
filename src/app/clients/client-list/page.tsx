@@ -48,7 +48,7 @@ export default function ClientsList() {
   const handleSearch = () => fetchClients(search.trim());
 
   return (
-    <div className="p-6 bg-gray-50 min-h-screen">
+    <div className="p-6  min-h-screen">
       <h2 className="text-xl font-semibold mb-4">Clients</h2>
 
       {/* Search */}
@@ -61,7 +61,7 @@ export default function ClientsList() {
           className="border-[2px] border-gray-300 rounded-lg text-black p-2 flex-1"
         />
         <button
-          className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg transition"
+          className="bg-[#8BE497] hover:scale-95 text-black px-4 py-2 rounded-lg transition"
           onClick={handleSearch}
         >
           Search
@@ -69,7 +69,7 @@ export default function ClientsList() {
       </div>
 
       {/* Table */}
-  <div className="overflow-x-auto border-[2px] border-gray-300 rounded-lg">
+  <div className="overflow-x-auto border-[2px] border-gray-300 bg-white rounded-lg">
   <table className="min-w-full divide-y divide-gray-200">
     <thead className="bg-gray-50">
       <tr className="font-medium">

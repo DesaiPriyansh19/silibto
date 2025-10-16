@@ -135,7 +135,7 @@ setBranches(Array.from(branchesSet) as string[]);
   });
 
   return (
-    <div className="p-6 bg-white min-h-screen">
+    <div className="p-6  min-h-screen">
       <Toaster position="top-right" />
       <h2 className="text-xl font-semibold mb-4">User Management</h2>
 
@@ -180,7 +180,7 @@ setBranches(Array.from(branchesSet) as string[]);
       </div>
 
       {/* Table */}
-      <div className="overflow-x-auto border-[2px] border-gray-300 rounded-lg">
+      <div className="overflow-x-auto border-[2px] border-gray-300 bg-white rounded-lg">
         <table className="min-w-full divide-y divide-gray-200">
           <thead className="bg-gray-50">
             <tr className="font-medium">
@@ -240,7 +240,7 @@ setBranches(Array.from(branchesSet) as string[]);
           className="bg-[#8BE497] hover:scale-95 text-black px-3 py-1 rounded-lg transition"
           onClick={() => router.push(`/users-permissions/user-details/${user.id}`)}
         >
-          Manage
+          manage
         </button>
       </td>
     </tr>

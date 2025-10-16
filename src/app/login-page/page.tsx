@@ -106,7 +106,7 @@ const handleBranchSelect = () => {
 
   return (
     <div className="flex flex-col md:flex-row h-screen w-full bg-white">
-       {loading && <Loading message="Logging in..." />} {/* Show loader overlay when loading */}
+       {loading && <Loading message="Just a moment…" />} {/* Show loader overlay when loading */}
       <Toaster position="top-right" />
 
       {/* Left - Logo */}
