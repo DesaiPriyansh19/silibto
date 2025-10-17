@@ -204,125 +204,119 @@ useEffect(() => {
             onClick={() => setIsSidebarOpen(false)}
           ></div>
 
-          <div className="fixed top-0 right-0 w-64 h-full bg-white shadow-lg z-50 flex flex-col overflow-y-auto transition-transform duration-300">
-            <div className="flex justify-center items-center gap-2 px-1 pt-1 pb-2 ">
-              <div className="flex items-center justify-center">
-                <Image
-                  src="/small-logo.png"
-                  alt="Logo"
-                  width={60}
-                  height={60}
-                />
-           <span className="flex flex-col gap-0 ">
-  <p className="text-sm font-bold m-0">Welcome</p>
-  <p className="text-xsm font-normal m-0">{user?.fullName ?? "User"}</p>
-  <p className="text-sm font-normal text-gray-700 m-0">{user?.role ?? "Role"}</p>
-    
-</span>
+      <div className="fixed top-0 right-0 w-64 h-full bg-white shadow-lg z-50 flex flex-col transition-transform duration-300">
+  {/* Header */}
+  <div className="flex justify-center items-center gap-2 px-1 pt-1 pb-2 shrink-0">
+    <div className="flex items-center justify-center">
+      <Image src="/small-logo.png" alt="Logo" width={50} height={50} />
+      <span className="flex flex-col gap-0">
+        <p className="text-sm font-bold m-0">Welcome</p>
+        <p className="text-xsm font-normal m-0">{user?.fullName ?? "User"}</p>
+        <p className="text-sm font-normal text-gray-700 m-0">{user?.role ?? "Role"}</p>
+      </span>
+    </div>
 
-              </div>
+    <FiBell className="text-2xl cursor-pointer mt-10" />
+    <select className="rounded-lg text-sm border-[1.8px] px-2 py-1 mt-10">
+      <option>2024</option>
+      <option>2023</option>
+    </select>
 
+    <button
+      className="absolute top-1.5 right-1.5"
+      onClick={() => setIsSidebarOpen(false)}
+    >
+      <HiX size={24} />
+    </button>
+  </div>
 
-                <FiBell className="text-2xl cursor-pointer mt-10" />
-               <select className="rounded-lg text-sm border-[1.8px] px-2 py-1  mt-10">
-                <option>2024</option>
-                <option>2023</option>
-              </select>
-            
-              <button className=" absolute top-1.5 right-1.5" onClick={() => setIsSidebarOpen(false)}>
-                <HiX size={24} />
-              </button>
-            </div>
-  
-            <ul className="flex flex-col font-semibold text-sm">
-              {upperNavItems.map((item) => {
-                if (item === "Home") {
-                  return (
-                    <li
-                      key="Home"
-                      className={`border-b px-4 py-2 cursor-pointer ${
-                        activeUpper === "Home" ? "bg-[#F2F2F2]" : ""
-                      }`}
-                      onClick={() => {
-                        setActiveUpper("Home");
-                        setIsSidebarOpen(false);
-                      }}
-                    >
-                      <Link href="/">Home</Link>
-                    </li>
-                  );
-                }
+  {/* Scrollable Menu */}
+  <ul className="flex-1 overflow-y-auto font-semibold text-sm">
+    {upperNavItems.map((item) => {
+      if (item === "Home") {
+        return (
+          <li
+            key="Home"
+            className={`border-b px-4 py-2 cursor-pointer ${
+              activeUpper === "Home" ? "bg-[#F2F2F2]" : ""
+            }`}
+            onClick={() => {
+              setActiveUpper("Home");
+              setIsSidebarOpen(false);
+            }}
+          >
+            <Link href="/">Home</Link>
+          </li>
+        );
+      }
 
-                const hasSub: string[] | undefined = lowerNavItems[item];
-                const isOpen = openSubMenu === item;
+      const hasSub = lowerNavItems[item];
+      const isOpen = openSubMenu === item;
 
+      return (
+        <li key={item} className="border-b">
+          <div
+            className={`flex justify-between items-center cursor-pointer px-4 py-2 ${
+              activeUpper === item ? "bg-[#F2F2F2]" : ""
+            }`}
+            onClick={() => {
+              setActiveUpper(item);
+              setOpenSubMenu(isOpen ? null : item);
+            }}
+          >
+            <span>{item}</span>
+            {hasSub &&
+              (isOpen ? (
+                <HiChevronDown size={18} />
+              ) : (
+                <HiChevronRight size={18} />
+              ))}
+          </div>
+
+          {hasSub && (
+            <ul
+              className={`pl-6 pr-4 overflow-y-auto transition-all duration-300 ${
+                isOpen ? "max-h-40 opacity-100" : "max-h-0 opacity-0"
+              }`}
+            >
+              {hasSub.map((sub) => {
+                const href = lowerNavLinks[sub];
                 return (
-                  <li key={item} className="border-b">
-                    <div
-                      className={`flex justify-between items-center cursor-pointer px-4 py-2 ${
-                        activeUpper === item ? "bg-[#F2F2F2]" : ""
-                      }`}
-                      onClick={() => {
-                        setActiveUpper(item);
-                        setOpenSubMenu(isOpen ? null : item);
-                      }}
-                    >
-                      <span>{item}</span>
-                      {hasSub &&
-                        (isOpen ? (
-                          <HiChevronDown size={18} />
-                        ) : (
-                          <HiChevronRight size={18} />
-                        ))}
-                    </div>
-
-                    {hasSub && (
-                      <ul
-                        className={`pl-6 pr-4 overflow-y-scroll transition-all duration-300 ${
-                          isOpen ? "max-h-40 opacity-100" : "max-h-0 opacity-0"
-                        }`}
-                      >
-                        {hasSub.map((sub) => {
-                          const href = lowerNavLinks[sub];
-                          return (
-<li
-  key={sub}
-  className={`py-1 cursor-pointer ${
-    activeLower === `${activeUpper}|${sub}`
-      ? "text-black font-medium"
-      : "text-gray-600"
-  }`}
-  onClick={() => {
-    setActiveLower(`${activeUpper}|${sub}`);
-    setIsSidebarOpen(false); // close sidebar after clicking sub-link
-  }}
->
-  {href ? <Link href={href}>• {sub}</Link> : <>• {sub}</>}
-</li>
-
-
-                          );
-                        })}
-                      </ul>
-                    )}
+                  <li
+                    key={sub}
+                    className={`py-1 cursor-pointer ${
+                      activeLower === `${activeUpper}|${sub}`
+                        ? "text-black font-medium"
+                        : "text-gray-600"
+                    }`}
+                    onClick={() => {
+                      setActiveLower(`${activeUpper}|${sub}`);
+                      setIsSidebarOpen(false);
+                    }}
+                  >
+                    {href ? <Link href={href}>• {sub}</Link> : <>• {sub}</>}
                   </li>
                 );
               })}
-           
             </ul>
-            {/* Right - Icons + Year */}
-            <div className="absolute bg-white w-full py-2 z-10right-1 bottom-2 flex items-center justify-end  gap-4  px-3">
+          )}
+        </li>
+      );
+    })}
+  </ul>
 
-              <FiSettings className="text-2xl cursor-pointer" />
-                       <button
-    onClick={logout}
-    className=" ml-2  bg-[#B3261E] text-sm flex items-center justify-center gap-2 text-white px-4 py-[0.5rem]  rounded-xl "
-  >
-    Logout <FiLogOut className="text-lg cursor-pointer" />
-  </button> 
-         
-            </div>
-          </div>
+  {/* Footer (fixed at bottom) */}
+  <div className="shrink-0 bg-white w-full py-2 flex items-center justify-end gap-4 px-3 border-t">
+    <FiSettings className="text-2xl cursor-pointer" />
+    <button
+      onClick={logout}
+      className="ml-2 bg-[#B3261E] text-sm flex items-center justify-center gap-2 text-white px-4 py-[0.5rem] rounded-xl"
+    >
+      Logout <FiLogOut className="text-lg cursor-pointer" />
+    </button>
+  </div>
+</div>
+
         </>
       )}
     </div>
