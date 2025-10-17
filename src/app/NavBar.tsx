@@ -306,7 +306,7 @@ useEffect(() => {
   </ul>
 
   {/* Footer (fixed at bottom) */}
-  <div className="shrink-0 bg-white w-full py-2 flex items-center justify-end gap-4 px-3 border-t">
+  <div className="shrink-0 bg-white w-full py-2 flex items-center justify-end gap-4 px-3 ">
     <FiSettings className="text-2xl cursor-pointer" />
     <button
       onClick={logout}
