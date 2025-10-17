@@ -215,8 +215,9 @@ useEffect(() => {
                 />
            <span className="flex flex-col gap-0 ">
   <p className="text-sm font-bold m-0">Welcome</p>
-  <p className="text-lg font-normal m-0">User</p>
-  <p className="text-sm font-normal m-0">admin</p>
+  <p className="text-lg font-normal m-0">{user?.fullName ?? "User"}</p>
+  <p className="text-sm font-normal m-0">{user?.role ?? "Role"}</p>
+    
 </span>
 
               </div>
@@ -277,7 +278,7 @@ useEffect(() => {
 
                     {hasSub && (
                       <ul
-                        className={`pl-6 pr-4 overflow-hidden transition-all duration-300 ${
+                        className={`pl-6 pr-4 overflow-y-scroll transition-all duration-300 ${
                           isOpen ? "max-h-40 opacity-100" : "max-h-0 opacity-0"
                         }`}
                       >
@@ -310,14 +311,14 @@ useEffect(() => {
            
             </ul>
             {/* Right - Icons + Year */}
-            <div className="absolute w-full py-2 z-10right-1 bottom-2 flex items-center justify-end  gap-4  px-3">
+            <div className="absolute bg-white w-full py-2 z-10right-1 bottom-2 flex items-center justify-end  gap-4  px-3">
 
               <FiSettings className="text-2xl cursor-pointer" />
                        <button
     onClick={logout}
-    className=" ml-2  bg-[#B3261E] flex items-center justify-center gap-2 text-white px-4 py-[0.5rem]  rounded-xl "
+    className=" ml-2  bg-[#B3261E] text-sm flex items-center justify-center gap-2 text-white px-4 py-[0.5rem]  rounded-xl "
   >
-    Logout <FiLogOut className="text-xl cursor-pointer" />
+    Logout <FiLogOut className="text-lg cursor-pointer" />
   </button> 
          
             </div>
