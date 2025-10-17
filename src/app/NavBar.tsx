@@ -215,8 +215,8 @@ useEffect(() => {
                 />
            <span className="flex flex-col gap-0 ">
   <p className="text-sm font-bold m-0">Welcome</p>
-  <p className="text-lg font-normal m-0">{user?.fullName ?? "User"}</p>
-  <p className="text-sm font-normal m-0">{user?.role ?? "Role"}</p>
+  <p className="text-xsm font-normal m-0">{user?.fullName ?? "User"}</p>
+  <p className="text-sm font-normal text-gray-700 m-0">{user?.role ?? "Role"}</p>
     
 </span>
 
