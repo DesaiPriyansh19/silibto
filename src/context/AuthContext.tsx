@@ -4,7 +4,7 @@ import { createContext, useContext, useState, useEffect, ReactNode } from "react
 import { useRouter } from "next/navigation";
 
 // Types
-interface Brand { id: string; name: string; description?: string;  }
+interface Brand { id: string; name: string; description?: string; }
 interface Branch { id: string; name: string; location?: string; brand: Brand; }
 interface User { id: string; fullName?: string; email: string; role: string; brand: Brand; branches?: Branch[]; [key: string]: any; }
 
@@ -21,6 +21,17 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
+// ✅ Helper: Check if JWT is expired
+function isTokenExpired(token: string): boolean {
+  try {
+    const payload = JSON.parse(atob(token.split(".")[1]));
+    const exp = payload.exp * 1000; // convert to ms
+    return Date.now() > exp;
+  } catch {
+    return true; // invalid token → treat as expired
+  }
+}
+
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [token, setToken] = useState<string | null>(null);
@@ -28,12 +39,24 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [loading, setLoading] = useState(true);
   const router = useRouter();
 
-  // Load from localStorage
+  // Load from localStorage + check token validity
   useEffect(() => {
     try {
       const storedUser = localStorage.getItem("user");
       const storedToken = localStorage.getItem("token");
       const storedBranch = localStorage.getItem("selectedBranch");
+
+      // 🧠 Check if token exists but expired
+      if (storedToken && isTokenExpired(storedToken)) {
+        localStorage.removeItem("user");
+        localStorage.removeItem("token");
+        localStorage.removeItem("selectedBranch");
+        setUser(null);
+        setToken(null);
+        setSelectedBranch(null);
+        router.replace("/login-page");
+        return;
+      }
 
       if (storedUser) setUser(JSON.parse(storedUser));
       if (storedToken) setToken(storedToken);
@@ -48,7 +71,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [router]);
 
   const login = ({ user, token }: { user: User; token: string }) => {
     setUser(user);
@@ -66,8 +89,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     if (user.branches && user.branches.length === 1) {
       selectBranch(user.branches[0]);
     }
-
-    // Multi-branch → stay on login page for branch selection
   };
 
   const selectBranch = (branch: Branch) => {
@@ -89,7 +110,18 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const isAuthenticated = !!user && !!token && (user.role === "admin" || !!selectedBranch);
 
   return (
-    <AuthContext.Provider value={{ user, token, selectedBranch, isAuthenticated, loading, login, logout, selectBranch }}>
+    <AuthContext.Provider
+      value={{
+        user,
+        token,
+        selectedBranch,
+        isAuthenticated,
+        loading,
+        login,
+        logout,
+        selectBranch,
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );

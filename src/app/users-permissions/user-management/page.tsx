@@ -135,7 +135,7 @@ setBranches(Array.from(branchesSet) as string[]);
   });
 
   return (
-    <div className="p-6  min-h-screen">
+    <div className="p-2 md:p-6  min-h-screen">
       <Toaster position="top-right" />
       <h2 className="text-xl font-semibold mb-4">User Management</h2>
 

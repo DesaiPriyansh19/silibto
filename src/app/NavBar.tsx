@@ -10,7 +10,8 @@ import {
   HiChevronRight,
   HiChevronDown,
 } from "react-icons/hi";
-import { FiBell, FiSettings } from "react-icons/fi";
+import { FiBell, FiSettings,FiLogOut } from "react-icons/fi";
+
 import Link from "next/link";
 import Home from "@/assets/icons/Home.svg";
 import { useRouter } from "next/navigation";
@@ -204,24 +205,34 @@ useEffect(() => {
           ></div>
 
           <div className="fixed top-0 right-0 w-64 h-full bg-white shadow-lg z-50 flex flex-col overflow-y-auto transition-transform duration-300">
-            <div className="flex justify-between p-4">
-              <div className="flex ">
+            <div className="flex justify-center items-center gap-2 px-1 pt-1 pb-2 ">
+              <div className="flex items-center justify-center">
                 <Image
                   src="/small-logo.png"
                   alt="Logo"
-                  width={50}
-                  height={50}
+                  width={60}
+                  height={60}
                 />
-                <span>
-                  <p className="text-sm font-bold">Welcome </p>
-                  <p className="text-lg font-normal">User </p>
-                </span>
+           <span className="flex flex-col gap-0 ">
+  <p className="text-sm font-bold m-0">Welcome</p>
+  <p className="text-lg font-normal m-0">User</p>
+  <p className="text-sm font-normal m-0">admin</p>
+</span>
+
               </div>
-              <button onClick={() => setIsSidebarOpen(false)}>
+
+
+                <FiBell className="text-2xl cursor-pointer mt-10" />
+               <select className="rounded-lg text-sm border-[1.8px] px-2 py-1  mt-10">
+                <option>2024</option>
+                <option>2023</option>
+              </select>
+            
+              <button className=" absolute top-1.5 right-1.5" onClick={() => setIsSidebarOpen(false)}>
                 <HiX size={24} />
               </button>
             </div>
-
+  
             <ul className="flex flex-col font-semibold text-sm">
               {upperNavItems.map((item) => {
                 if (item === "Home") {
@@ -299,19 +310,16 @@ useEffect(() => {
            
             </ul>
             {/* Right - Icons + Year */}
-            <div className="absolute bg-white z-10right-1 bottom-2 flex items-center gap-4">
-              <button
+            <div className="absolute w-full py-2 z-10right-1 bottom-2 flex items-center justify-end  gap-4  px-3">
+
+              <FiSettings className="text-2xl cursor-pointer" />
+                       <button
     onClick={logout}
-    className=" ml-2 border-[1px] border-red-700 text-red-700 px-2 py-1 text-sm rounded-sm mt-3"
+    className=" ml-2  bg-[#B3261E] flex items-center justify-center gap-2 text-white px-4 py-[0.5rem]  rounded-xl "
   >
-    Logout
+    Logout <FiLogOut className="text-xl cursor-pointer" />
   </button> 
-              <FiBell className="text-xl cursor-pointer" />
-              <FiSettings className="text-xl cursor-pointer" />
-              <select className="rounded-full border px-3 py-1">
-                <option>2024</option>
-                <option>2023</option>
-              </select>
+         
             </div>
           </div>
         </>
