@@ -10,6 +10,7 @@ import {
   FiChevronDown,
   FiChevronUp,
   FiLoader,
+  FiSearch,
 } from "react-icons/fi";
 
 interface Option {
@@ -37,6 +38,7 @@ export default function ProductMaster() {
   const [expandedCategoryIds, setExpandedCategoryIds] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
   const [initialLoading, setInitialLoading] = useState(true);
+  const [searchTerm, setSearchTerm] = useState("");
 
   // category modal
   const [categoryModalOpen, setCategoryModalOpen] = useState(false);
@@ -56,10 +58,9 @@ export default function ProductMaster() {
   const fetchCategories = async () => {
     if (!token) return;
     try {
-      const res = await fetch(
-        `${process.env.NEXT_PUBLIC_SERVER_URL}/api/product-master`,
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
+      const res = await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/product-master`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
       const data = await res.json();
       setCategories(data.docs || []);
     } catch (err) {
@@ -73,14 +74,6 @@ export default function ProductMaster() {
   useEffect(() => {
     fetchCategories();
   }, [token]);
-
-  // ---------------- Helpers ----------------
-  const refreshCategoryInState = (updatedCategory: Category) => {
-    setCategories((prev) =>
-      prev.map((c) => (c.id === updatedCategory.id ? updatedCategory : c))
-    );
-    setSelectedCategory(updatedCategory);
-  };
 
   // ---------------- Category Handlers ----------------
   const toggleCategoryExpand = (cat: Category) => {
@@ -123,7 +116,7 @@ export default function ProductMaster() {
         );
         toast.success("Category updated");
       }
-      await fetchCategories(); // 🔁 Refresh after add/edit
+      await fetchCategories();
       setCategoryModalOpen(false);
       setCurrentCategoryName("");
       setCategoryAction(null);
@@ -139,12 +132,12 @@ export default function ProductMaster() {
     if (!confirm("Are you sure you want to delete this category?")) return;
     setLoading(true);
     try {
-      await fetch(
-        `${process.env.NEXT_PUBLIC_SERVER_URL}/api/product-master/${catId}`,
-        { method: "DELETE", headers: { Authorization: `Bearer ${token}` } }
-      );
+      await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/product-master/${catId}`, {
+        method: "DELETE",
+        headers: { Authorization: `Bearer ${token}` },
+      });
       toast.success("Category deleted");
-      await fetchCategories(); // 🔁 Refresh after delete
+      await fetchCategories();
     } catch (err) {
       console.error(err);
       toast.error("Error deleting category");
@@ -225,8 +218,7 @@ export default function ProductMaster() {
         }
       );
       toast.success("Saved successfully");
-      await fetchCategories(); // 🔁 Refresh after any sub/option change
-
+      await fetchCategories();
       setDropdownModalOpen(false);
       setDropdownInputValue("");
       setActiveGroup(null);
@@ -245,17 +237,14 @@ export default function ProductMaster() {
     setLoading(true);
     try {
       const updatedGroups = cat.dropdownGroups.filter((g) => g.id !== groupId);
-      await fetch(
-        `${process.env.NEXT_PUBLIC_SERVER_URL}/api/product-master/${cat.id}`,
-        {
-          method: "PATCH",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify({ dropdownGroups: updatedGroups }),
-        }
-      );
+      await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/product-master/${cat.id}`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ dropdownGroups: updatedGroups }),
+      });
       toast.success("Subcategory deleted");
       await fetchCategories();
     } catch (err) {
@@ -273,17 +262,14 @@ export default function ProductMaster() {
       const updatedGroups = cat.dropdownGroups.map((g) =>
         g.id === groupId ? { ...g, options: g.options.filter((o) => o.id !== optionId) } : g
       );
-      await fetch(
-        `${process.env.NEXT_PUBLIC_SERVER_URL}/api/product-master/${cat.id}`,
-        {
-          method: "PATCH",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify({ dropdownGroups: updatedGroups }),
-        }
-      );
+      await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/product-master/${cat.id}`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ dropdownGroups: updatedGroups }),
+      });
       toast.success("Option deleted");
       await fetchCategories();
     } catch (err) {
@@ -308,13 +294,33 @@ export default function ProductMaster() {
     );
   }
 
+  // Filter options based on search term
+  const filteredCategories = categories.map((cat) => ({
+    ...cat,
+    dropdownGroups: cat.dropdownGroups.map((group) => ({
+      ...group,
+      options: group.options.filter((opt) =>
+        opt.value.toLowerCase().includes(searchTerm.toLowerCase())
+      ),
+    })),
+  }));
+
   return (
     <div className="p-6 w-full">
       <h1 className="text-3xl font-bold mb-6 text-center">Product Master</h1>
 
-      {/* Category Select + Add */}
-      <div className="flex items-center gap-2 mb-6">
-     
+      {/* Search + Add */}
+      <div className="flex items-center justify-between mb-6">
+        <div className="flex items-center border rounded-lg px-3 py-2 w-72 bg-white">
+          <FiSearch className="text-gray-500 mr-2" />
+          <input
+            type="text"
+            placeholder="Search options..."
+            className="outline-none w-full"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
+        </div>
 
         <button
           className="bg-[#5DD86E] text-black px-4 py-2 rounded-lg hover:scale-95 flex items-center gap-1"
@@ -330,15 +336,15 @@ export default function ProductMaster() {
 
       {/* Categories */}
       <div className="space-y-3">
-        {categories.map((cat) => (
+        {filteredCategories.map((cat) => (
           <div key={cat.id} className="border-2 border-gray-300 p-3 rounded-xl bg-white">
             <div className="flex justify-between items-center">
-              
-          <div className="flex items-center justify-center">      <button onClick={() => toggleCategoryExpand(cat)} className="text-4xl ">
+              <div className="flex items-center justify-center">
+                <button onClick={() => toggleCategoryExpand(cat)} className="text-4xl">
                   {expandedCategoryIds.includes(cat.id) ? <FiChevronUp /> : <FiChevronDown />}
                 </button>
-                 <h2 className="font-semibold">{cat.categoryName}</h2> 
-</div>
+                <h2 className="font-semibold">{cat.categoryName}</h2>
+              </div>
 
               <div className="flex gap-2 items-center">
                 <button
@@ -350,41 +356,50 @@ export default function ProductMaster() {
                   }}
                   className="text-white text-lg font-extrabold bg-black rounded-xl p-1"
                 >
-                  <FiEdit className="" />
+                  <FiEdit />
                 </button>
 
-                <button onClick={() => deleteCategory(cat.id)}            className="text-white text-lg font-extrabold bg-black rounded-xl p-1">
-                  <FiTrash2 className="" />
+                <button
+                  onClick={() => deleteCategory(cat.id)}
+                  className="text-white text-lg font-extrabold bg-black rounded-xl p-1"
+                >
+                  <FiTrash2 />
                 </button>
 
                 <button
                   onClick={() => openDropdownModal("add-sub", cat)}
-                  title="Add Subcategory"
-                             className="text-white text-lg font-extrabold bg-black rounded-xl p-1"
+                  className="text-white text-lg font-extrabold bg-black rounded-xl p-1"
                 >
-                  <FiPlus className="" />
+                  <FiPlus />
                 </button>
-
-             
               </div>
             </div>
 
             {/* Subcategories */}
             {expandedCategoryIds.includes(cat.id) && (
               <div className="pl-4 mt-3 space-y-3">
-                {cat.dropdownGroups?.map((group) => (
+                {cat.dropdownGroups.map((group) => (
                   <div key={group.id} className="border border-gray-300 p-3 rounded-xl">
                     <div className="flex justify-between items-center mb-2">
                       <h3 className="font-medium">{group.dropdownName}</h3>
                       <div className="flex gap-2 items-center">
-                        <button onClick={() => openDropdownModal("add-option", cat, group)}           className="text-black hover:text-blue-700 text-lg font-extrabold  rounded-xl p-1 hover:scale-110">
-                          <FiPlus className="" />
+                        <button
+                          onClick={() => openDropdownModal("add-option", cat, group)}
+                          className="text-black hover:text-blue-700 text-lg font-extrabold rounded-xl p-1 hover:scale-110"
+                        >
+                          <FiPlus />
                         </button>
-                        <button onClick={() => openDropdownModal("edit-sub", cat, group)}            className="text-black hover:text-blue-700 text-lg font-extrabold  rounded-xl p-1 hover:scale-110">
-                          <FiEdit className="" />
+                        <button
+                          onClick={() => openDropdownModal("edit-sub", cat, group)}
+                          className="text-black hover:text-blue-700 text-lg font-extrabold rounded-xl p-1 hover:scale-110"
+                        >
+                          <FiEdit />
                         </button>
-                        <button onClick={() => deleteSubcategory(cat, group.id)}            className="text-black hover:text-red-700 text-lg font-extrabold  rounded-xl p-1 hover:scale-110">
-                          <FiTrash2 className="" />
+                        <button
+                          onClick={() => deleteSubcategory(cat, group.id)}
+                          className="text-black hover:text-red-700 text-lg font-extrabold rounded-xl p-1 hover:scale-110"
+                        >
+                          <FiTrash2 />
                         </button>
                       </div>
                     </div>
@@ -396,20 +411,17 @@ export default function ProductMaster() {
                           className="flex items-center gap-1 border border-gray-200 rounded-xl px-2 py-1"
                         >
                           {opt.value}
-                          <button
-                            onClick={() =>
-                              openDropdownModal("edit-option", cat, group, opt)
-                            }
-                          >
+                          <button onClick={() => openDropdownModal("edit-option", cat, group, opt)}>
                             <FiEdit className="text-black hover:text-blue-700 text-sm" />
                           </button>
-                          <button
-                            onClick={() => deleteOption(cat, group.id, opt.id)}
-                          >
+                          <button onClick={() => deleteOption(cat, group.id, opt.id)}>
                             <FiTrash2 className="text-black hover:text-red-700 text-sm" />
                           </button>
                         </div>
                       ))}
+                      {group.options.length === 0 && (
+                        <p className="text-gray-400 text-sm">No options match your search.</p>
+                      )}
                     </div>
                   </div>
                 ))}
@@ -439,7 +451,7 @@ export default function ProductMaster() {
               : dropdownAction === "edit-sub"
               ? "Edit Subcategory"
               : dropdownAction === "add-option"
-              ? `Add Option`
+              ? "Add Option"
               : "Edit Option"
           }
           value={dropdownInputValue}
