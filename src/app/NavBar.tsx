@@ -17,7 +17,7 @@ import Home from "@/assets/icons/Home.svg";
 import { useRouter } from "next/navigation";
 // Define lower nav structure
 const lowerNavItems: Record<string, string[]> = {
-  Product:["Product Master"],
+  Product:["Product Master","Add Product"],
   Sales: ["New Lead", "New Inquiry", "Pending Inquiry"],
   Purchase: ["Purchase Item1", "Purchase Item2"],
   Stocks: ["Stocks Item1", "Stocks Item2"],
@@ -28,6 +28,7 @@ const lowerNavItems: Record<string, string[]> = {
 // Map each submenu item to a href
 const lowerNavLinks: Record<string, string> = {
   "Product Master":"/product/product-master",
+  "Add Product":"/product/add-product",
   "New Lead": "",
   "New Inquiry": "",
   "Pending Inquiry": "",
