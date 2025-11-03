@@ -11,6 +11,7 @@ import {
   FiChevronUp,
   FiLoader,
   FiSearch,
+   FiToggleRight
 } from "react-icons/fi";
 
 interface Option {
@@ -22,6 +23,7 @@ interface DropdownGroup {
   dropdownName: string;
   options: Option[];
   id: string;
+    isMultiSelect?: boolean; // ✅ new field
 }
 
 interface Category {
@@ -53,6 +55,7 @@ export default function ProductMaster() {
   >(null);
   const [activeGroup, setActiveGroup] = useState<DropdownGroup | null>(null);
   const [activeOption, setActiveOption] = useState<Option | null>(null);
+const [isMultiSelect, setIsMultiSelect] = useState(false);
 
   // ---------------- Fetch Categories ----------------
   const fetchCategories = async () => {
@@ -146,22 +149,27 @@ export default function ProductMaster() {
     }
   };
 
-  // ---------------- Subcategory / Option Handlers ----------------
-  const openDropdownModal = (
-    action: "add-sub" | "edit-sub" | "add-option" | "edit-option",
-    cat?: Category,
-    group?: DropdownGroup,
-    option?: Option
-  ) => {
-    if (cat) setSelectedCategory(cat);
-    setActiveGroup(group || null);
-    setActiveOption(option || null);
-    setDropdownAction(action);
-    if (action === "edit-sub") setDropdownInputValue(group?.dropdownName || "");
-    else if (action === "edit-option") setDropdownInputValue(option?.value || "");
-    else setDropdownInputValue("");
-    setDropdownModalOpen(true);
-  };
+const openDropdownModal = (
+  action: "add-sub" | "edit-sub" | "add-option" | "edit-option",
+  cat?: Category,
+  group?: DropdownGroup,
+  option?: Option
+) => {
+  if (cat) setSelectedCategory(cat);
+  setActiveGroup(group || null);
+  setActiveOption(option || null);
+  setDropdownAction(action);
+
+  if (action === "edit-sub") {
+    setDropdownInputValue(group?.dropdownName || "");
+    setIsMultiSelect(group?.isMultiSelect || false); // ✅ populate
+  } else {
+    setDropdownInputValue("");
+    setIsMultiSelect(false);
+  }
+
+  setDropdownModalOpen(true);
+};
 
   const saveDropdownChange = async () => {
     if (!selectedCategory) return toast.error("No category selected");
@@ -176,11 +184,15 @@ export default function ProductMaster() {
           dropdownName: dropdownInputValue,
           options: [],
           id: crypto.randomUUID(),
+              isMultiSelect, // ✅ added
         });
-      } else if (dropdownAction === "edit-sub" && activeGroup) {
-        updatedGroups = updatedGroups.map((g) =>
-          g.id === activeGroup.id ? { ...g, dropdownName: dropdownInputValue } : g
-        );
+      }else if (dropdownAction === "edit-sub" && activeGroup) {
+  updatedGroups = updatedGroups.map((g) =>
+    g.id === activeGroup.id
+      ? { ...g, dropdownName: dropdownInputValue, isMultiSelect }
+      : g
+  );
+
       } else if (dropdownAction === "add-option" && activeGroup) {
         updatedGroups = updatedGroups.map((g) =>
           g.id === activeGroup.id
@@ -334,102 +346,140 @@ export default function ProductMaster() {
         </button>
       </div>
 
-      {/* Categories */}
-      <div className="space-y-3">
-        {filteredCategories.map((cat) => (
-          <div key={cat.id} className="border-2 border-gray-300 p-3 rounded-xl bg-white">
-            <div className="flex justify-between items-center">
-              <div className="flex items-center justify-center">
-                <button onClick={() => toggleCategoryExpand(cat)} className="text-4xl">
-                  {expandedCategoryIds.includes(cat.id) ? <FiChevronUp /> : <FiChevronDown />}
-                </button>
-                <h2 className="font-semibold">{cat.categoryName}</h2>
+{/* Categories */}
+{/* Categories */}
+<div className="space-y-3">
+  {filteredCategories.map((cat) => (
+    <div
+      key={cat.id}
+      className="border-2 border-gray-300 p-3 rounded-xl bg-white"
+    >
+      {/* Category Header */}
+      <div className="flex justify-between items-center">
+        <div className="flex items-center justify-center">
+          <button
+            onClick={() => toggleCategoryExpand(cat)}
+            className="text-4xl"
+          >
+            {expandedCategoryIds.includes(cat.id) ? (
+              <FiChevronUp />
+            ) : (
+              <FiChevronDown />
+            )}
+          </button>
+          <h2 className="font-semibold ml-2">{cat.categoryName}</h2>
+        </div>
+
+        {/* Category Actions */}
+        <div className="flex gap-2 items-center">
+          <button
+            onClick={() => {
+              setCategoryAction("edit");
+              setCurrentCategoryName(cat.categoryName);
+              setSelectedCategory(cat);
+              setCategoryModalOpen(true);
+            }}
+            className="text-white text-lg font-extrabold bg-black rounded-xl p-1"
+          >
+            <FiEdit />
+          </button>
+
+          <button
+            onClick={() => deleteCategory(cat.id)}
+            className="text-white text-lg font-extrabold bg-black rounded-xl p-1"
+          >
+            <FiTrash2 />
+          </button>
+
+          <button
+            onClick={() => openDropdownModal("add-sub", cat)}
+            className="text-white text-lg font-extrabold bg-black rounded-xl p-1"
+          >
+            <FiPlus />
+          </button>
+        </div>
+      </div>
+
+      {/* Subcategories */}
+      {expandedCategoryIds.includes(cat.id) && (
+        <div className="pl-4 mt-3 space-y-3">
+          {cat.dropdownGroups.map((group) => (
+            <div
+              key={group.id}
+              className="border border-gray-300 p-3 rounded-xl"
+            >
+              {/* Subcategory Header */}
+              <div className="flex justify-between items-center mb-2">
+                <div className="flex items-center gap-2">
+                  <h3 className="font-medium">{group.dropdownName}</h3>
+
+                  {/* 👇 Multi-select Enabled Icon */}
+                  {group.isMultiSelect && (
+                    <span className="flex items-center  text-sm bg-green-100 px-2 py-0.5 rounded-full">
+                      <FiToggleRight className="mr-1 text-xl text-green-600" /> Multi Enabled
+                    </span>
+                  )}
+                </div>
+
+                {/* Subcategory Actions */}
+                <div className="flex gap-2 items-center">
+                  <button
+                    onClick={() => openDropdownModal("add-option", cat, group)}
+                    className="text-black hover:text-blue-700 text-lg font-extrabold rounded-xl p-1 hover:scale-110"
+                  >
+                    <FiPlus />
+                  </button>
+                  <button
+                    onClick={() => openDropdownModal("edit-sub", cat, group)}
+                    className="text-black hover:text-blue-700 text-lg font-extrabold rounded-xl p-1 hover:scale-110"
+                  >
+                    <FiEdit />
+                  </button>
+                  <button
+                    onClick={() => deleteSubcategory(cat, group.id)}
+                    className="text-black hover:text-red-700 text-lg font-extrabold rounded-xl p-1 hover:scale-110"
+                  >
+                    <FiTrash2 />
+                  </button>
+                </div>
               </div>
 
-              <div className="flex gap-2 items-center">
-                <button
-                  onClick={() => {
-                    setCategoryAction("edit");
-                    setCurrentCategoryName(cat.categoryName);
-                    setSelectedCategory(cat);
-                    setCategoryModalOpen(true);
-                  }}
-                  className="text-white text-lg font-extrabold bg-black rounded-xl p-1"
-                >
-                  <FiEdit />
-                </button>
-
-                <button
-                  onClick={() => deleteCategory(cat.id)}
-                  className="text-white text-lg font-extrabold bg-black rounded-xl p-1"
-                >
-                  <FiTrash2 />
-                </button>
-
-                <button
-                  onClick={() => openDropdownModal("add-sub", cat)}
-                  className="text-white text-lg font-extrabold bg-black rounded-xl p-1"
-                >
-                  <FiPlus />
-                </button>
-              </div>
-            </div>
-
-            {/* Subcategories */}
-            {expandedCategoryIds.includes(cat.id) && (
-              <div className="pl-4 mt-3 space-y-3">
-                {cat.dropdownGroups.map((group) => (
-                  <div key={group.id} className="border border-gray-300 p-3 rounded-xl">
-                    <div className="flex justify-between items-center mb-2">
-                      <h3 className="font-medium">{group.dropdownName}</h3>
-                      <div className="flex gap-2 items-center">
-                        <button
-                          onClick={() => openDropdownModal("add-option", cat, group)}
-                          className="text-black hover:text-blue-700 text-lg font-extrabold rounded-xl p-1 hover:scale-110"
-                        >
-                          <FiPlus />
-                        </button>
-                        <button
-                          onClick={() => openDropdownModal("edit-sub", cat, group)}
-                          className="text-black hover:text-blue-700 text-lg font-extrabold rounded-xl p-1 hover:scale-110"
-                        >
-                          <FiEdit />
-                        </button>
-                        <button
-                          onClick={() => deleteSubcategory(cat, group.id)}
-                          className="text-black hover:text-red-700 text-lg font-extrabold rounded-xl p-1 hover:scale-110"
-                        >
-                          <FiTrash2 />
-                        </button>
-                      </div>
-                    </div>
-
-                    <div className="flex flex-wrap gap-2">
-                      {group.options.map((opt) => (
-                        <div
-                          key={opt.id}
-                          className="flex items-center gap-1 border border-gray-200 rounded-xl px-2 py-1"
-                        >
-                          {opt.value}
-                          <button onClick={() => openDropdownModal("edit-option", cat, group, opt)}>
-                            <FiEdit className="text-black hover:text-blue-700 text-sm" />
-                          </button>
-                          <button onClick={() => deleteOption(cat, group.id, opt.id)}>
-                            <FiTrash2 className="text-black hover:text-red-700 text-sm" />
-                          </button>
-                        </div>
-                      ))}
-                      {group.options.length === 0 && (
-                        <p className="text-gray-400 text-sm">oops! No options match your search.</p>
-                      )}
-                    </div>
+              {/* Subcategory Options */}
+              <div className="flex flex-wrap gap-2">
+                {group.options.map((opt) => (
+                  <div
+                    key={opt.id}
+                    className="flex items-center gap-1 border border-gray-200 rounded-xl px-2 py-1"
+                  >
+                    {opt.value}
+                    <button
+                      onClick={() =>
+                        openDropdownModal("edit-option", cat, group, opt)
+                      }
+                    >
+                      <FiEdit className="text-black hover:text-blue-700 text-sm" />
+                    </button>
+                    <button
+                      onClick={() => deleteOption(cat, group.id, opt.id)}
+                    >
+                      <FiTrash2 className="text-black hover:text-red-700 text-sm" />
+                    </button>
                   </div>
                 ))}
+                {group.options.length === 0 && (
+                  <p className="text-gray-400 text-sm">
+                    oops! No options match your search.
+                  </p>
+                )}
               </div>
-            )}
-          </div>
-        ))}
-      </div>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  ))}
+</div>
+
 
       {/* Modals */}
       {categoryModalOpen && (
@@ -443,29 +493,33 @@ export default function ProductMaster() {
         />
       )}
 
-      {dropdownModalOpen && (
-        <Modal
-          title={
-            dropdownAction === "add-sub"
-              ? "Add Subcategory"
-              : dropdownAction === "edit-sub"
-              ? "Edit Subcategory"
-              : dropdownAction === "add-option"
-              ? "Add Option"
-              : "Edit Option"
-          }
-          value={dropdownInputValue}
-          onChange={setDropdownInputValue}
-          onClose={() => {
-            setDropdownModalOpen(false);
-            setActiveGroup(null);
-            setActiveOption(null);
-            setDropdownAction(null);
-          }}
-          onSave={saveDropdownChange}
-          loading={loading}
-        />
-      )}
+  {dropdownModalOpen && (
+  <Modal
+    title={
+      dropdownAction === "add-sub"
+        ? "Add Subcategory"
+        : dropdownAction === "edit-sub"
+        ? "Edit Subcategory"
+        : dropdownAction === "add-option"
+        ? "Add Option"
+        : "Edit Option"
+    }
+    value={dropdownInputValue}
+    onChange={setDropdownInputValue}
+    onClose={() => {
+      setDropdownModalOpen(false);
+      setActiveGroup(null);
+      setActiveOption(null);
+      setDropdownAction(null);
+    }}
+    onSave={saveDropdownChange}
+    loading={loading}
+    showCheckbox={dropdownAction === "add-sub" || dropdownAction === "edit-sub"} // ✅ show only for subcategories
+    checkboxValue={isMultiSelect}
+    onCheckboxChange={setIsMultiSelect}
+  />
+)}
+
     </div>
   );
 }
@@ -478,6 +532,9 @@ const Modal = ({
   onClose,
   onSave,
   loading,
+  showCheckbox = false,
+  checkboxValue = false,
+  onCheckboxChange,
 }: {
   title: string;
   value: string;
@@ -485,24 +542,44 @@ const Modal = ({
   onClose: () => void;
   onSave: () => void;
   loading: boolean;
+  showCheckbox?: boolean;
+  checkboxValue?: boolean;
+  onCheckboxChange?: (v: boolean) => void;
 }) => (
   <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
     <div className="bg-white p-6 rounded w-96">
       <h2 className="text-xl font-bold mb-4">{title}</h2>
+
       <input
         type="text"
         className="border p-2 w-full mb-4"
         value={value}
         onChange={(e) => onChange(e.target.value)}
       />
+
+      {/* ✅ Checkbox to mark multi-selection */}
+      {showCheckbox && (
+        <label className="flex items-center gap-2 mb-4">
+          <input
+            type="checkbox"
+            checked={checkboxValue}
+            onChange={(e) => onCheckboxChange?.(e.target.checked)}
+            className="h-7 w-7 "
+          />
+          <span className="text-sm text-gray-700 flex items-start justify-start">
+          Allow Multiple Selection (checkbox type in product creation)
+          </span>
+        </label>
+      )}
+
       <div className="flex justify-end gap-2">
-        <button className="bg-gray-300 px-3 py-1 rounded" onClick={onClose}>
+        <button className="bg-black text-white  px-3 py-2 rounded-lg" onClick={onClose}>
           Cancel
         </button>
         <button
           onClick={onSave}
           disabled={loading}
-          className={`bg-green-500 text-white px-3 py-1 rounded flex items-center gap-2 ${
+          className={`bg-green-500 text-black px-3 py-2 rounded-lg flex items-center gap-2 ${
             loading ? "opacity-60 cursor-not-allowed" : ""
           }`}
         >
@@ -513,3 +590,4 @@ const Modal = ({
     </div>
   </div>
 );
+
