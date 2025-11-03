@@ -26,6 +26,8 @@ interface User {
   mobileNumber?: string;
   email?: string;
   status?: "active" | "inactive";
+    createdAt? :string;
+  updatedAt?:string;
 }
 
 interface UserDetailsProps {
@@ -48,6 +50,8 @@ export default function UserDetails({ userId, onClose }: UserDetailsProps) {
     email: "",
     role: "",
     status: "active",
+        createdAt : "",
+  updatedAt: "",
     branches: [] as string[],
   });
 
@@ -91,6 +95,8 @@ export default function UserDetails({ userId, onClose }: UserDetailsProps) {
           role: data.role,
           status: data.status || "active",
           branches: data.branches?.map((b: Branch) => b.id) || [],
+              createdAt :data.createdAt || "",
+          updatedAt:data.updatedAt || "",
         });
       } catch (err: any) {
         console.error(err);
@@ -140,6 +146,8 @@ export default function UserDetails({ userId, onClose }: UserDetailsProps) {
         role: user.role,
         status: user.status || "active",
         branches: user.branches?.map((b) => b.id) || [],
+                createdAt :user.createdAt || "",
+          updatedAt:user.updatedAt || "",
       });
     }
   };
@@ -331,6 +339,34 @@ if (!user)
           </select>
         </div>
       </div>
+                   {/* Metadata Section */}
+<div className="flex flex-wrap items-center justify-between bg-gray-50 border border-gray-200 rounded-sm px-4 py-3 mt-6 ">
+  {/* Created At */}
+  <div className="flex flex-col">
+    <span className="text-xs uppercase tracking-wide text-gray-500">Created At</span>
+    <span className="text-sm font-semibold text-gray-800">
+      {formData.createdAt
+        ? new Date(formData.createdAt).toLocaleString("en-IN", {
+            dateStyle: "medium",
+            timeStyle: "short",
+          })
+        : "—"}
+    </span>
+  </div>
+
+  {/* Updated At */}
+  <div className="flex flex-col text-right">
+    <span className="text-xs uppercase tracking-wide text-gray-500">Last Updated</span>
+    <span className="text-sm font-semibold text-gray-800">
+      {formData.updatedAt
+        ? new Date(formData.updatedAt).toLocaleString("en-IN", {
+            dateStyle: "medium",
+            timeStyle: "short",
+          })
+        : "—"}
+    </span>
+  </div>
+</div>
     </div>
   );
 }

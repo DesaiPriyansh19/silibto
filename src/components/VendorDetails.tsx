@@ -4,73 +4,71 @@ import React, { useEffect, useState } from "react";
 import { toast, Toaster } from "react-hot-toast";
 import Loading from "./Loading";
 import Fallback from "./FallBack";
-import router from "next/router";
+import { useRouter } from "next/navigation";
 
-interface ClientDetailsProps {
-  clientId: string;
+interface VendorDetailsProps {
+  vendorId: string;
   onClose: () => void;
 }
 
-interface ClientData {
-  length: number;
-  firstName: string;
-  middleName?: string;
-  surname: string;
-  gender: string;
-  phone1: string;
-  phone2?: string;
+interface VendorData {
+  id: string;
+  companyName: string;
+  contactPerson: string;
+  contactNumber: string;
+  gstNumber: string;
   address?: string;
-  reference?: string;
-  familyGroup?: { id: string; headName?: string };
-    createdAt? :string;
+  email?: string;
+  createdAt? :string;
   updatedAt?:string;
 }
 
-export default function ClientDetails({ clientId, onClose }: ClientDetailsProps) {
-  const [client, setClient] = useState<ClientData | null>(null);
-  const [formData, setFormData] = useState<ClientData | any>({});
+export default function VendorDetails({ vendorId, onClose }: VendorDetailsProps) {
+  const [vendor, setVendor] = useState<VendorData | null>(null);
+  const [formData, setFormData] = useState<Partial<VendorData>>({});
   const [loading, setLoading] = useState(true);
   const [editing, setEditing] = useState(false);
   const [updating, setUpdating] = useState(false);
   const [deleting, setDeleting] = useState(false);
 
-  const token = localStorage.getItem("token"); // or use your auth context
+  const token = typeof window !== "undefined" ? localStorage.getItem("token") : null;
+  const router = useRouter();
 
   useEffect(() => {
-    fetchClient();
-  }, [clientId]);
+    fetchVendor();
+  }, [vendorId]);
 
-  const fetchClient = async () => {
+  const fetchVendor = async () => {
     if (!token) return;
     setLoading(true);
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/clients/${clientId}?depth=1`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/vendors/${vendorId}?depth=1`, {
         headers: { Authorization: `Bearer ${token}` },
         credentials: "include",
       });
       const data = await res.json();
       if (res.ok) {
-        setClient(data);
+        setVendor(data);
         setFormData(data);
-      }
+      } else toast.error("Failed to fetch vendor details");
     } catch (err) {
       console.error(err);
-      toast.error("Failed to fetch client data");
+      toast.error("Error fetching vendor details");
     } finally {
       setLoading(false);
     }
   };
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setFormData((prev: any) => ({ ...prev, [name]: value }));
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleSave = async () => {
     if (!token) return;
     setUpdating(true);
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/clients/${clientId}`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/vendors/${vendorId}`, {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",
@@ -79,79 +77,75 @@ export default function ClientDetails({ clientId, onClose }: ClientDetailsProps)
         body: JSON.stringify(formData),
       });
       if (res.ok) {
-        toast.success("Client updated successfully");
+        toast.success("Vendor updated successfully");
         setEditing(false);
-        fetchClient();
+        fetchVendor();
       } else {
         const data = await res.json();
-        toast.error(data.message || "Failed to update client");
+        toast.error(data.message || "Failed to update vendor");
       }
     } catch (err) {
       console.error(err);
-      toast.error("Failed to update client");
+      toast.error("Failed to update vendor");
     } finally {
       setUpdating(false);
     }
   };
 
   const handleCancel = () => {
-    setFormData(client);
+    setFormData(vendor || {});
     setEditing(false);
   };
 
   const handleDelete = async () => {
     if (!token) return;
-    if (!confirm("Are you sure you want to delete this client?")) return;
+    if (!confirm("Are you sure you want to delete this vendor?")) return;
 
     setDeleting(true);
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/clients/${clientId}`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/vendors/${vendorId}`, {
         method: "DELETE",
         headers: { Authorization: `Bearer ${token}` },
       });
       if (res.ok) {
-        toast.success("Client deleted successfully");
-        onClose(); // go back to client list
+        toast.success("Vendor deleted successfully");
+        onClose();
       } else {
         const data = await res.json();
-        toast.error(data.message || "Failed to delete client");
+        toast.error(data.message || "Failed to delete vendor");
       }
     } catch (err) {
       console.error(err);
-      toast.error("Failed to delete client");
+      toast.error("Failed to delete vendor");
     } finally {
       setDeleting(false);
     }
   };
 
-if (loading)
-  return (
-    <><Loading message="Fetching user details..."/></>
-  );
+  if (loading) return <Loading message="Fetching vendor details..." />;
 
-
-
-  if (!client || client.length === 0)
-  return (
-    <Fallback
-      title="No Clients Found"
-      message="We couldn’t find any clients in the system."
-      buttonText="Go to Dashboard"
-      onButtonClick={() => router.push("/dashboard")}
-    />
-  );
-
+  if (!vendor)
+    return (
+      <Fallback
+        title="No Vendor Found"
+        message="We couldn’t find this vendor."
+        buttonText="Go to Vendors"
+        onButtonClick={() => router.push("/vendors/vendor-list")}
+      />
+    );
 
   return (
     <div className="p-6 bg-white min-h-screen">
       <Toaster position="top-right" />
-{/* Back button */}
-  <button
-    className="absolute top-6 right-6 bg-gray-300 hover:scale-95 text-black px-4 py-2 rounded-lg transition"
-    onClick={onClose}
-  >
-    Back
-  </button>
+
+      {/* Back button */}
+      <button
+        className="absolute top-6 right-6 bg-gray-300 hover:scale-95 text-black px-4 py-2 rounded-lg transition"
+        onClick={onClose}
+      >
+        Back
+      </button>
+
       {/* Buttons */}
       <div className="flex justify-start gap-5 mb-6 text-sm">
         {!editing ? (
@@ -189,73 +183,56 @@ if (loading)
         )}
       </div>
 
+
       {/* Form */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+ {/* "createdAt": "2025-11-03T06:54:39.993Z",
+    "updatedAt": "2025-11-03T06:54:39.993Z", */}
+   
+        <div>
+          <label className="block font-medium">Company Name</label>
+          <input
+            name="companyName"
+            value={formData.companyName || ""}
+            onChange={handleChange}
+            disabled={!editing}
+            className="border-[2px] border-gray-300 rounded-lg p-2 w-full"
+          />
+        </div>
 
         <div>
-          <label className="block font-medium">First Name</label>
+          <label className="block font-medium">Contact Person</label>
           <input
-            name="firstName"
-            value={formData.firstName}
+            name="contactPerson"
+            value={formData.contactPerson || ""}
             onChange={handleChange}
             disabled={!editing}
             className="border-[2px] border-gray-300 rounded-lg p-2 w-full"
           />
         </div>
+
         <div>
-          <label className="block font-medium">Middle Name</label>
+          <label className="block font-medium">Contact Number</label>
           <input
-            name="middleName"
-            value={formData.middleName || ""}
+            name="contactNumber"
+            value={formData.contactNumber || ""}
             onChange={handleChange}
             disabled={!editing}
             className="border-[2px] border-gray-300 rounded-lg p-2 w-full"
           />
         </div>
+
         <div>
-          <label className="block font-medium">Surname</label>
+          <label className="block font-medium">GST Number</label>
           <input
-            name="surname"
-            value={formData.surname}
+            name="gstNumber"
+            value={formData.gstNumber || ""}
             onChange={handleChange}
             disabled={!editing}
             className="border-[2px] border-gray-300 rounded-lg p-2 w-full"
           />
         </div>
-        <div>
-          <label className="block font-medium">Gender</label>
-          <select
-            name="gender"
-            value={formData.gender}
-            onChange={handleChange}
-            disabled={!editing}
-            className="border-[2px] border-gray-300 rounded-lg p-2 w-full"
-          >
-            <option value="Male">Male</option>
-            <option value="Female">Female</option>
-            <option value="Other">Other</option>
-          </select>
-        </div>
-        <div>
-          <label className="block font-medium">Phone 1</label>
-          <input
-            name="phone1"
-            value={formData.phone1}
-            onChange={handleChange}
-            disabled={!editing}
-            className="border-[2px] border-gray-300 rounded-lg p-2 w-full"
-          />
-        </div>
-        <div>
-          <label className="block font-medium">Phone 2</label>
-          <input
-            name="phone2"
-            value={formData.phone2 || ""}
-            onChange={handleChange}
-            disabled={!editing}
-            className="border-[2px] border-gray-300 rounded-lg p-2 w-full"
-          />
-        </div>
+
         <div>
           <label className="block font-medium">Address</label>
           <input
@@ -266,18 +243,19 @@ if (loading)
             className="border-[2px] border-gray-300 rounded-lg p-2 w-full"
           />
         </div>
+
         <div>
-          <label className="block font-medium">Reference</label>
+          <label className="block font-medium">Email</label>
           <input
-            name="reference"
-            value={formData.reference || ""}
+            name="email"
+            value={formData.email || ""}
             onChange={handleChange}
             disabled={!editing}
             className="border-[2px] border-gray-300 rounded-lg p-2 w-full"
           />
         </div>
       </div>
-             {/* Metadata Section */}
+       {/* Metadata Section */}
 <div className="flex flex-wrap items-center justify-between bg-gray-50 border border-gray-200 rounded-sm px-4 py-3 mt-6 ">
   {/* Created At */}
   <div className="flex flex-col">
