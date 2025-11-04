@@ -13,7 +13,7 @@ interface DropdownGroup {
   dropdownName: string;
   options: Option[];
   id: string;
-  isMultiSelect?: boolean; // <-- important
+  isMultiSelect?: boolean;
 }
 
 interface Category {
@@ -22,7 +22,6 @@ interface Category {
   dropdownGroups: DropdownGroup[];
 }
 
-// allow either single string (select) or array of strings (checkboxes)
 type AttributeValue = string | string[];
 
 export default function AddProductPage() {
@@ -32,14 +31,15 @@ export default function AddProductPage() {
   const [selectedOptions, setSelectedOptions] = useState<Record<string, AttributeValue>>({});
   const [productName, setProductName] = useState("");
   const [price, setPrice] = useState("");
+  const [openingStock, setOpeningStock] = useState("");
   const [loading, setLoading] = useState(false);
 
-  // Fetch categories (ensure nested fields returned)
+  // ✅ Fetch categories from Payload API
   useEffect(() => {
     if (!token) return;
-
     const fetchCategories = async () => {
       try {
+        setLoading(true);
         const res = await fetch(
           `${process.env.NEXT_PUBLIC_SERVER_URL}/api/product-master?depth=2`,
           {
@@ -51,24 +51,26 @@ export default function AddProductPage() {
       } catch (err) {
         console.error(err);
         toast.error("Failed to fetch categories");
+      } finally {
+        setLoading(false);
       }
     };
-
     fetchCategories();
   }, [token]);
 
+  // ✅ Category change handler
   const handleCategoryChange = (catId: string) => {
     const cat = categories.find((c) => c.id === catId) || null;
     setSelectedCategory(cat);
-    setSelectedOptions({}); // reset attributes when category changes
+    setSelectedOptions({});
   };
 
-  // for single select
+  // ✅ Handle select dropdowns
   const handleSelectChange = (groupName: string, value: string) => {
     setSelectedOptions((prev) => ({ ...prev, [groupName]: value }));
   };
 
-  // for checkboxes (multi select)
+  // ✅ Handle checkboxes (multi-select)
   const handleCheckboxChange = (groupName: string, value: string, checked: boolean) => {
     setSelectedOptions((prev) => {
       const current = prev[groupName];
@@ -83,36 +85,30 @@ export default function AddProductPage() {
     });
   };
 
-  // validate required fields a bit: ensure category, productName, price. Also can validate required attributes if needed.
+  // ✅ Submit Product to Payload API
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!selectedCategory) return toast.error("Select a category first");
     if (!productName.trim()) return toast.error("Product name required");
     if (!price.trim()) return toast.error("Price required");
 
-    // Build attributes object to send:
-    // For groups that are multi-select, ensure array (even empty array is allowed).
-    // For single-select groups, send string or empty string.
+    // Prepare attributes object
     const attributes: Record<string, any> = {};
     selectedCategory.dropdownGroups.forEach((group) => {
       const key = group.dropdownName;
       const val = selectedOptions[key];
-
       if (group.isMultiSelect) {
-        // ensure array
-        if (Array.isArray(val)) attributes[key] = val;
-        else if (typeof val === "string" && val) attributes[key] = [val];
-        else attributes[key] = []; // no selection
+        attributes[key] = Array.isArray(val) ? val : val ? [val] : [];
       } else {
-        // single value
         attributes[key] = typeof val === "string" ? val : "";
       }
     });
 
     const productData = {
       productName,
-      price,
-      categoryId: selectedCategory.id,
+      price: Number(price),
+      openingStock: Number(openingStock),
+      category: selectedCategory.id, // ✅ payload expects relationship field name
       attributes,
     };
 
@@ -127,14 +123,12 @@ export default function AddProductPage() {
         body: JSON.stringify(productData),
       });
 
-      if (!res.ok) {
-        const text = await res.text().catch(() => "");
-        throw new Error(text || "Failed to add product");
-      }
+      if (!res.ok) throw new Error(await res.text());
 
-      toast.success("Product added successfully!");
+      toast.success("✅ Product added successfully!");
       setProductName("");
       setPrice("");
+      setOpeningStock("");
       setSelectedCategory(null);
       setSelectedOptions({});
     } catch (err) {
@@ -145,34 +139,6 @@ export default function AddProductPage() {
     }
   };
 
-  // debug helper you can remove later
-  useEffect(() => {
-    if (selectedCategory) {
-      // log what the category's groups look like (to confirm isMultiSelect is present)
-      console.debug("Selected category groups:", selectedCategory.dropdownGroups);
-    }
-  }, [selectedCategory]);
-useEffect(() => {
-  if (selectedCategory) console.log("groups:", selectedCategory.dropdownGroups);
-}, [selectedCategory]);
-
-
-useEffect(() => {
-  const fetchCategories = async () => {
-    setLoading(true);
-    try {
-      const res = await fetch("/api/categories");
-      const data = await res.json();
-      setCategories(data);
-    } catch (err) {
-      console.error(err);
-    } finally {
-      setLoading(false);
-    }
-  };
-  fetchCategories();
-}, []);
-
   return (
     <div className="min-h-screen bg-white flex items-center justify-center p-6">
       <div className="rounded-2xl w-full max-w-5xl p-8 md:p-10">
@@ -181,38 +147,32 @@ useEffect(() => {
         </h1>
 
         <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          {/* Left Side */}
+          {/* LEFT SIDE */}
           <div className="space-y-6">
-{/* Category Select */}
-<div>
-  <label className="block font-medium text-gray-700 mb-2">
-    Select Category
-  </label>
-
-  {loading ? (
-    <div className="flex items-center border border-gray-300 rounded-lg p-3 w-full bg-gray-50 justify-center">
-      <div className="h-4 w-4 border-2 border-green-500 border-t-transparent rounded-full animate-spin"></div>
-      <span className="ml-2 text-gray-500 text-sm">Loading...</span>
-    </div>
-  ) : (
-    <select
-      className="border border-gray-300 rounded-lg p-3 w-full focus:ring-2 focus:ring-green-500 outline-none disabled:bg-gray-100 disabled:cursor-not-allowed"
-      value={selectedCategory?.id || ""}
-      onChange={(e) => handleCategoryChange(e.target.value)}
-      disabled={loading}
-      required
-    >
-      <option value="">Select Category</option>
-      {categories.map((cat) => (
-        <option key={cat.id} value={cat.id}>
-          {cat.categoryName}
-        </option>
-      ))}
-    </select>
-  )}
-</div>
-
-
+            {/* Category Select */}
+            <div>
+              <label className="block font-medium text-gray-700 mb-2">Select Category</label>
+              {loading ? (
+                <div className="flex items-center border border-gray-300 rounded-lg p-3 bg-gray-50 justify-center">
+                  <div className="h-4 w-4 border-2 border-green-500 border-t-transparent rounded-full animate-spin"></div>
+                  <span className="ml-2 text-gray-500 text-sm">Loading...</span>
+                </div>
+              ) : (
+                <select
+                  className="border border-gray-300 rounded-lg p-3 w-full focus:ring-2 focus:ring-green-500 outline-none"
+                  value={selectedCategory?.id || ""}
+                  onChange={(e) => handleCategoryChange(e.target.value)}
+                  required
+                >
+                  <option value="">Select Category</option>
+                  {categories.map((cat) => (
+                    <option key={cat.id} value={cat.id}>
+                      {cat.categoryName}
+                    </option>
+                  ))}
+                </select>
+              )}
+            </div>
 
             {/* Product Name */}
             <div>
@@ -239,9 +199,22 @@ useEffect(() => {
                 required
               />
             </div>
+
+            {/* Opening Stock */}
+            <div>
+              <label className="block font-medium text-gray-700 mb-2">Opening Stock</label>
+              <input
+                type="number"
+                className="border border-gray-300 rounded-lg p-3 w-full focus:ring-2 focus:ring-green-500 outline-none"
+                value={openingStock}
+                onChange={(e) => setOpeningStock(e.target.value)}
+                placeholder="Enter opening stock"
+                required
+              />
+            </div>
           </div>
 
-          {/* Right Side - Dynamic Dropdowns */}
+          {/* RIGHT SIDE - Dynamic Dropdowns */}
           <div className="space-y-6">
             {selectedCategory && selectedCategory.dropdownGroups.length > 0 ? (
               selectedCategory.dropdownGroups.map((group) => (
@@ -255,56 +228,55 @@ useEffect(() => {
                     )}
                   </label>
 
-                {group.isMultiSelect ? (
-  <div className="flex flex-wrap gap-3">
-    {group.options.map((opt) => {
-      const currentValues = Array.isArray(selectedOptions[group.dropdownName])
-        ? selectedOptions[group.dropdownName]
-        : [];
-      const checked = currentValues.includes(opt.value);
-      return (
-        <label key={opt.id} className="flex items-center gap-2">
-          <input
-            type="checkbox"
-            checked={checked}
-            onChange={(e) =>
-              handleCheckboxChange(group.dropdownName, opt.value, e.target.checked)
-            }
-          />
-          <span>{opt.value}</span>
-        </label>
-      );
-    })}
-  </div>
-) : (
-  <select
-    className="border border-gray-300 rounded-lg p-3 w-full focus:ring-2 focus:ring-green-500 outline-none"
-    value={(selectedOptions[group.dropdownName] as string) || ""}
-    onChange={(e) => handleSelectChange(group.dropdownName, e.target.value)}
-    required
-  >
-    <option value="">Select {group.dropdownName}</option>
-    {group.options.map((opt) => (
-      <option key={opt.id} value={opt.value}>
-        {opt.value}
-      </option>
-    ))}
-  </select>
-)}
-
+                  {group.isMultiSelect ? (
+                    <div className="flex flex-wrap gap-3">
+                      {group.options.map((opt) => {
+                        const currentValues = Array.isArray(selectedOptions[group.dropdownName])
+                          ? selectedOptions[group.dropdownName]
+                          : [];
+                        const checked = currentValues.includes(opt.value);
+                        return (
+                          <label key={opt.id} className="flex items-center gap-2">
+                            <input
+                              type="checkbox"
+                              checked={checked}
+                              onChange={(e) =>
+                                handleCheckboxChange(group.dropdownName, opt.value, e.target.checked)
+                              }
+                            />
+                            <span>{opt.value}</span>
+                          </label>
+                        );
+                      })}
+                    </div>
+                  ) : (
+                    <select
+                      className="border border-gray-300 rounded-lg p-3 w-full focus:ring-2 focus:ring-green-500 outline-none"
+                      value={(selectedOptions[group.dropdownName] as string) || ""}
+                      onChange={(e) => handleSelectChange(group.dropdownName, e.target.value)}
+                      required
+                    >
+                      <option value="">Select {group.dropdownName}</option>
+                      {group.options.map((opt) => (
+                        <option key={opt.id} value={opt.value}>
+                          {opt.value}
+                        </option>
+                      ))}
+                    </select>
+                  )}
                 </div>
               ))
             ) : (
-              <p className="text-gray-500 text-xl italic mt-4">Select a category to load options</p>
+              <p className="text-gray-500 text-lg italic">Select a category to load options</p>
             )}
           </div>
 
-          {/* Full-width Submit Button */}
+          {/* Submit Button */}
           <div className="col-span-1 md:col-span-2 flex justify-center mt-6">
             <button
               type="submit"
               disabled={loading}
-              className="bg-green-600 hover:bg-green-700 text-black font-light px-8 py-3 rounded-lg transition-all shadow-md disabled:opacity-60"
+              className="bg-green-600 hover:bg-green-700 text-white font-medium px-8 py-3 rounded-lg transition-all shadow-md disabled:opacity-60"
             >
               {loading ? "Saving..." : "+ Add Product"}
             </button>

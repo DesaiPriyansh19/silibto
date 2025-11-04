@@ -4,7 +4,7 @@ import React, { useEffect, useState, useMemo } from "react";
 import { useAuth } from "@/context/AuthContext";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-
+import { FiRefreshCcw } from "react-icons/fi"; // import refresh icon
 interface Vendor {
   id: string;
   companyName: string;
@@ -22,7 +22,7 @@ export default function VendorsList() {
   const [filtered, setFiltered] = useState<Vendor[]>([]);
   const [loading, setLoading] = useState(false);
   const [search, setSearch] = useState("");
-
+  const [isRefreshing, setIsRefreshing] = useState(false);
   useEffect(() => {
     if (user?.role === "admin") fetchVendors();
   }, [token, user]);
@@ -65,6 +65,16 @@ export default function VendorsList() {
     return () => clearTimeout(timeout);
   }, [search, vendors]);
 
+  const handleRefresh = async () => {
+    if (isRefreshing) return; // prevent multiple clicks
+    setIsRefreshing(true);
+
+    await fetchVendors();
+
+    // Fast animation (about 0.6s) then unlock
+    setTimeout(() => setIsRefreshing(false), 600);
+  };
+
   return (
     <div className="p-2 md:p-6 min-h-screen">
     <div className="flex items-center justify-between mb-3 "> 
@@ -81,8 +91,21 @@ export default function VendorsList() {
           onChange={(e) => setSearch(e.target.value)}
           className="border-[2px] border-gray-300 rounded-lg text-black p-2 flex-1"
         />
+           <button
+              onClick={handleRefresh}
+              disabled={isRefreshing}
+              className={`flex items-center gap-2 bg-black text-white px-4 py-2 rounded-lg transition-transform duration-200 
+                ${isRefreshing ? "opacity-70 cursor-not-allowed" : "hover:scale-95"}`}
+            >
+              <FiRefreshCcw
+                className={`text-lg   transition-transform duration-500 ease-in-out text-white ${
+                  isRefreshing ? "rotate-[720deg]" : "rotate-0"
+                }`}
+              />
+              <span>{isRefreshing ? "Refreshing..." : "Refresh"}</span>
+            </button>
         {loading && (
-          <div className="text-gray-500 text-sm">Loading vendors...</div>
+          <></>
         )}
       </div>
 

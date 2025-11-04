@@ -3,7 +3,7 @@
 import React, { useEffect, useState, useMemo } from "react";
 import { useAuth } from "@/context/AuthContext";
 import { useRouter } from "next/navigation";
-
+import { FiRefreshCcw } from "react-icons/fi"; // import refresh icon
 interface Client {
   id: string;
   firstName: string;
@@ -24,7 +24,7 @@ export default function ClientsList() {
   const [clients, setClients] = useState<Client[]>([]);
   const [loading, setLoading] = useState(false);
   const [search, setSearch] = useState("");
-
+  const [isRefreshing, setIsRefreshing] = useState(false);
   // ✅ Fetch all clients only once
   useEffect(() => {
     if (user?.role === "admin") fetchAllClients();
@@ -69,6 +69,15 @@ export default function ClientsList() {
     );
   }, [search, clients]);
 
+  const handleRefresh = async () => {
+    if (isRefreshing) return; // prevent multiple clicks
+    setIsRefreshing(true);
+
+    await fetchAllClients();
+
+    // Fast animation (about 0.6s) then unlock
+    setTimeout(() => setIsRefreshing(false), 600);
+  };
   return (
     <div className="p-2 md:p-6 min-h-screen">
       <h2 className="text-xl sm:text-2xl font-semibold mb-4">Clients</h2>
@@ -82,6 +91,19 @@ export default function ClientsList() {
           onChange={(e) => setSearch(e.target.value)}
           className="border-[2px] border-gray-300 rounded-lg text-black p-2 flex-1"
         />
+   <button
+      onClick={handleRefresh}
+      disabled={isRefreshing}
+      className={`flex items-center gap-2 bg-black text-white px-4 py-2 rounded-lg transition-transform duration-200 
+        ${isRefreshing ? "opacity-70 cursor-not-allowed" : "hover:scale-95"}`}
+    >
+      <FiRefreshCcw
+        className={`text-lg   transition-transform duration-500 ease-in-out text-white ${
+          isRefreshing ? "rotate-[720deg]" : "rotate-0"
+        }`}
+      />
+      <span>{isRefreshing ? "Refreshing..." : "Refresh"}</span>
+    </button>
       </div>
 
       {/* Table */}

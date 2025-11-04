@@ -4,6 +4,7 @@ import React, { useState, useEffect } from "react";
 import toast, { Toaster } from "react-hot-toast";
 import { useAuth } from "@/context/AuthContext";
 import { useRouter } from "next/navigation";
+import { FiRefreshCcw } from "react-icons/fi"; // import refresh icon
 // Interfaces
 interface Brand {
   id: string;
@@ -42,97 +43,131 @@ const router = useRouter();
   // Dynamic filter options
   const [roles, setRoles] = useState<string[]>([]);
   const [branches, setBranches] = useState<string[]>([]);
+  const [isRefreshing, setIsRefreshing] = useState(false);
 
-  // Fetch users
-  useEffect(() => {
+  // ✅ Extracted fetch function so we can reuse it
+  const fetchAllUsers = async () => {
     if (!token) return;
 
-    const fetchUsers = async () => {
-      setLoading(true);
-      try {
-        const res = await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/users`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        const data = await res.json();
-        if (!res.ok) {
-          console.error("Error fetching users:", data);
-          toast.error(data.errors?.[0]?.message || "Cannot fetch users. You might not have permission.");
-          setUsers([]);
-          return;
-        }
+    setLoading(true);
+    try {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/users`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const data = await res.json();
 
-        const usersData = data.docs || data;
-        setUsers(usersData);
+      if (!res.ok) {
+        console.error("Error fetching users:", data);
+        toast.error(
+          data.errors?.[0]?.message ||
+            "Cannot fetch users. You might not have permission."
+        );
+        setUsers([]);
+        return;
+      }
 
-        // Extract dynamic roles and branches
-const rolesSet = new Set(usersData.map((u: User) => u.role));
-setRoles(Array.from(rolesSet) as string[]);
+      const usersData = data.docs || data;
+      setUsers(usersData);
 
-const branchesSet = new Set(
+      // Extract roles and branches
+    const rolesSet = new Set<string>(usersData.map((u: User) => u.role));
+setRoles(Array.from(rolesSet));
+
+const branchesSet = new Set<string>(
   usersData.flatMap((u: User) => u.branches?.map((b) => b.name) || [])
 );
-setBranches(Array.from(branchesSet) as string[]);
+setBranches(Array.from(branchesSet));
 
+    } catch (err) {
+      console.error(err);
+      toast.error("Error fetching users");
+    } finally {
+      setLoading(false);
+    }
+  };
 
-      } catch (err) {
-        console.error(err);
-        toast.error("Error fetching users");
-      } finally {
-        setLoading(false);
-      }
-    };
+  // ✅ Initial fetch
 
-    if (user?.role === "admin") fetchUsers();
+  useEffect(() => {
+    if (user?.role === "admin") fetchAllUsers();
     else {
       toast.error("You do not have permission to view users");
       setLoading(false);
     }
   }, [token, user]);
 
-  // Toggle user status
-  const toggleUserStatus = async (userId: string, currentStatus: "active" | "inactive") => {
-    setUpdatingStatus((prev) => [...prev, userId]);
+  // ✅ Refresh handler with animation + lock
+  const handleRefresh = async () => {
+    if (isRefreshing) return;
+    setIsRefreshing(true);
 
-    try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/users/${userId}`, {
+    await fetchAllUsers();
+
+    // Short, fast spin (~0.5s)
+    setTimeout(() => setIsRefreshing(false), 500);
+  };
+
+  // ✅ Filter logic
+  const filteredUsers = users.filter((u) => {
+    const name = u.fullName || "";
+    const mobile = u.mobileNumber || "";
+    const matchesSearch =
+      name.toLowerCase().includes(search.toLowerCase()) ||
+      mobile.toLowerCase().includes(search.toLowerCase());
+    const matchesRole = roleFilter ? u.role === roleFilter : true;
+    const matchesBranch = branchFilter
+      ? u.branches?.some((b) => b.name === branchFilter)
+      : true;
+    const matchesStatus = statusFilter ? u.status === statusFilter : true;
+    return matchesSearch && matchesRole && matchesBranch && matchesStatus;
+  })
+// ✅ Add this before `return (...)`
+const toggleUserStatus = async (
+  userId: string,
+  currentStatus: "active" | "inactive"
+) => {
+  setUpdatingStatus((prev) => [...prev, userId]);
+
+  try {
+    const res = await fetch(
+      `${process.env.NEXT_PUBLIC_SERVER_URL}/api/users/${userId}`,
+      {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify({ status: currentStatus === "active" ? "inactive" : "active" }),
-      });
-
-      const data = await res.json();
-      if (!res.ok) {
-        console.error("Error updating status:", data);
-        toast.error(data.errors?.[0]?.message || "Failed to update status");
-        return;
+        body: JSON.stringify({
+          status: currentStatus === "active" ? "inactive" : "active",
+        }),
       }
+    );
 
-      setUsers((prev) =>
-        prev.map((u) =>
-          u.id === userId ? { ...u, status: currentStatus === "active" ? "inactive" : "active" } : u
-        )
-      );
-    } catch (err) {
-      console.error("Error updating status:", err);
-      toast.error("Error updating status");
-    } finally {
-      setUpdatingStatus((prev) => prev.filter((id) => id !== userId));
+    const data = await res.json();
+
+    if (!res.ok) {
+      console.error("Error updating status:", data);
+      toast.error(data.errors?.[0]?.message || "Failed to update status");
+      return;
     }
-  };
 
-  // Filter users
-  const filteredUsers = users.filter((u) => {
-    const name = u.fullName || "";
-    const mobile = u.mobileNumber || "";
-    const matchesSearch = name.toLowerCase().includes(search.toLowerCase()) || mobile.toLowerCase().includes(search.toLowerCase());
-    const matchesRole = roleFilter ? u.role === roleFilter : true;
-    const matchesBranch = branchFilter ? u.branches?.some((b) => b.name === branchFilter) : true;
-    const matchesStatus = statusFilter ? u.status === statusFilter : true;
-    return matchesSearch && matchesRole && matchesBranch && matchesStatus;
-  });
+    // ✅ Update UI immediately
+    setUsers((prev) =>
+      prev.map((u) =>
+        u.id === userId
+          ? { ...u, status: currentStatus === "active" ? "inactive" : "active" }
+          : u
+      )
+    );
+
+    toast.success("User status updated!");
+  } catch (err) {
+    console.error("Error updating status:", err);
+    toast.error("Error updating status");
+  } finally {
+    setUpdatingStatus((prev) => prev.filter((id) => id !== userId));
+  }
+};
 
   return (
     <div className="p-2 md:p-6  min-h-screen">
@@ -177,6 +212,19 @@ setBranches(Array.from(branchesSet) as string[]);
           <option value="active">Active</option>
           <option value="inactive">Inactive</option>
         </select>
+            <button
+              onClick={handleRefresh}
+              disabled={isRefreshing}
+              className={`flex items-center gap-2 bg-black text-white px-4 py-2 rounded-lg transition-transform duration-200 
+                ${isRefreshing ? "opacity-70 cursor-not-allowed" : "hover:scale-95"}`}
+            >
+              <FiRefreshCcw
+                className={`text-lg text-white transition-transform duration-500 ease-in-out ${
+                  isRefreshing ? "rotate-[720deg]" : "rotate-0"
+                }`}
+              />
+              <span>{isRefreshing ? "Refreshing..." : "Refresh"}</span>
+            </button>
       </div>
 
       {/* Table */}

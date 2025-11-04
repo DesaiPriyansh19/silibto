@@ -17,10 +17,10 @@ import Home from "@/assets/icons/Home.svg";
 import { useRouter } from "next/navigation";
 // Define lower nav structure
 const lowerNavItems: Record<string, string[]> = {
-  Product:["Product Master","Add Product"],
+  Product:["Product Master","Add Product", "Product List"],
   Sales: ["New Lead", "New Inquiry", "Pending Inquiry"],
   Purchase: ["Purchase Item1", "Purchase Item2"],
-  Stocks: ["Stocks Item1", "Stocks Item2"],
+  Stocks: ["Inventry", ],
   ClientData: ["Add New Client","Add Family Group","Clients List"],
  Users:['Manage Users',"Create Users" ],
 Accounts:['Vendors']
@@ -35,14 +35,15 @@ const lowerNavLinks: Record<string, string> = {
   "Pending Inquiry": "",
   "Purchase Item1": "",
   "Purchase Item2": "",
-  "Stocks Item1": "",
-  "Stocks Item2": "",
+  "Inventry": "",
+
   "Add New Client": "/clients/add-new-client",
   "Clients List":"/clients/client-list",
   "Add Family Group" :"/create-family-group",
   "Manage Users": "/users-permissions/user-management",
   "Create Users":"/users-permissions/create-user",
-  "Vendors":"/vendors/vendor-list"
+  "Vendors":"/vendors/vendor-list",
+  "Product List":"/product/product-list",
 };
 
 // Upper nav items
