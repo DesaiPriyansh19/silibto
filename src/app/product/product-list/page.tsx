@@ -4,7 +4,8 @@ import React, { useEffect, useState, useMemo } from "react";
 import { useAuth } from "@/context/AuthContext";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { FiRefreshCcw } from "react-icons/fi"; // import refresh icon
+import { FiRefreshCcw } from "react-icons/fi";
+
 interface Product {
   id: string;
   productName: string;
@@ -25,6 +26,7 @@ export default function ProductsList() {
   const [search, setSearch] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("");
   const [isRefreshing, setIsRefreshing] = useState(false);
+
   useEffect(() => {
     if (user?.role === "admin") {
       fetchAllProducts();
@@ -32,7 +34,7 @@ export default function ProductsList() {
     }
   }, [token, user]);
 
-  // ✅ Fetch products
+  // Fetch all products
   const fetchAllProducts = async () => {
     if (!token) return;
     setLoading(true);
@@ -44,13 +46,13 @@ export default function ProductsList() {
       const data = await res.json();
       if (res.ok) setProducts(data?.docs || []);
     } catch (err) {
-      console.error(err);
+      console.error("Error fetching products:", err);
     } finally {
       setLoading(false);
     }
   };
 
-  // ✅ Fetch categories
+  // Fetch categories
   const fetchCategories = async () => {
     if (!token) return;
     try {
@@ -61,15 +63,14 @@ export default function ProductsList() {
       const data = await res.json();
       if (res.ok) setCategories(data?.docs || []);
     } catch (err) {
-      console.error(err);
+      console.error("Error fetching categories:", err);
     }
   };
 
-  // ✅ Fast local filter — by search + category
+  // Filter products by search & category
   const filteredProducts = useMemo(() => {
     let filtered = products;
 
-    // Filter by category
     if (selectedCategory) {
       filtered = filtered.filter(
         (p) =>
@@ -78,7 +79,6 @@ export default function ProductsList() {
       );
     }
 
-    // Filter by search text
     if (search.trim()) {
       const lower = search.toLowerCase();
       filtered = filtered.filter((p) =>
@@ -97,39 +97,62 @@ export default function ProductsList() {
     return filtered;
   }, [products, search, selectedCategory]);
 
-
+  // Refresh button
   const handleRefresh = async () => {
-    if (isRefreshing) return; // prevent multiple clicks
+    if (isRefreshing) return;
     setIsRefreshing(true);
-
     await fetchAllProducts();
-
-    // Fast animation (about 0.6s) then unlock
     setTimeout(() => setIsRefreshing(false), 600);
   };
 
+  // Format attributes neatly
+  const formatAttributes = (attributes?: Record<string, any>) => {
+    if (!attributes) return "-";
+    return Object.entries(attributes)
+      .map(([k, v]) => `${k}: ${Array.isArray(v) ? v.join(", ") : v}`)
+      .join(" | ");
+  };
+
   return (
-    <div className="p-2 md:p-6 min-h-screen">
-   
-    <div className="flex items-center justify-between mb-3 lg:mb-6 xl:mb-10 "> 
-        <h2 className="text-xl sm:text-2xl font-semibold mb-4">Products</h2>
-      <Link href={'/product/add-product'}> 
-      <button className="bg-[#5DD86E] text-black px-4 py-2 text-sm rounded-lg hover:scale-95 flex items-center gap-1">+ add new product</button> </Link> 
-         </div>  
-      {/* 🔍 Filters */}
-      <div className="flex flex-wrap gap-3 mb-6 items-center text-sm">
+    <div className="p-4 md:p-8 min-h-screen bg-gray-50">
+      {/* Header */}
+      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
+        <h2 className="text-2xl md:text-3xl font-semibold text-gray-800">Products</h2>
+        <div className="flex flex-wrap gap-3">
+          <Link href="/product/add-product">
+            <button className="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600 transition">
+              + Add New Product
+            </button>
+          </Link>
+          <button
+            onClick={handleRefresh}
+            disabled={isRefreshing}
+            className={`flex items-center gap-2 bg-gray-800 text-white px-4 py-2 rounded-lg transition-transform duration-200 
+              ${isRefreshing ? "opacity-70 cursor-not-allowed" : "hover:scale-95"}`}
+          >
+            <FiRefreshCcw
+              className={`text-lg transition-transform duration-500 ease-in-out ${
+                isRefreshing ? "rotate-[720deg]" : "rotate-0"
+              }`}
+            />
+            <span>{isRefreshing ? "Refreshing..." : "Refresh"}</span>
+          </button>
+        </div>
+      </div>
+
+      {/* Filters */}
+      <div className="flex flex-wrap gap-3 mb-6">
         <input
           type="text"
           placeholder="Search products..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          className="border-[2px] border-gray-300 bg-white rounded-lg text-black p-2 flex-1"
+          className="flex-1 min-w-[200px] p-2 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
         />
-
         <select
           value={selectedCategory}
           onChange={(e) => setSelectedCategory(e.target.value)}
-          className="border-[2px] border-gray-300 bg-white rounded-lg text-black p-2"
+          className="p-2 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
         >
           <option value="">All Categories</option>
           {categories.map((c) => (
@@ -138,44 +161,29 @@ export default function ProductsList() {
             </option>
           ))}
         </select>
-
-     <button
-      onClick={handleRefresh}
-      disabled={isRefreshing}
-      className={`flex items-center gap-2 bg-black text-white px-4 py-2 rounded-lg transition-transform duration-200 
-        ${isRefreshing ? "opacity-70 cursor-not-allowed" : "hover:scale-95"}`}
-    >
-      <FiRefreshCcw
-        className={`text-lg text-white transition-transform duration-500 ease-in-out ${
-          isRefreshing ? "rotate-[720deg]" : "rotate-0"
-        }`}
-      />
-      <span>{isRefreshing ? "Refreshing..." : "Refresh"}</span>
-    </button>
       </div>
 
-      {/* Table */}
-      <div className="overflow-x-auto border-[2px] border-gray-300 bg-white rounded-lg">
+      {/* Products Table */}
+      <div className="overflow-x-auto bg-white rounded-lg shadow border border-gray-200">
         <table className="min-w-full divide-y divide-gray-200">
-          <thead className="bg-gray-50">
-            <tr className="font-medium">
-              <th className="px-4 py-2 text-left">Product Name</th>
-              <th className="px-4 py-2 text-left">Price</th>
-              <th className="px-4 py-2 text-left">Opening Stock</th>
-              <th className="px-4 py-2 text-left">Category</th>
-              <th className="px-4 py-2 text-left">Attributes</th>
-              <th className="px-4 py-2 text-left">Created</th>
-              <th className="px-4 py-2 text-left">Manage</th>
+          <thead className="bg-gray-100">
+            <tr className="text-left text-sm md:text-base font-medium text-gray-700">
+              <th className="px-4 py-3">Product Name</th>
+              <th className="px-4 py-3">Price</th>
+              <th className="px-4 py-3">Opening Stock</th>
+              <th className="px-4 py-3">Category</th>
+              <th className="px-4 py-3">Attributes</th>
+              <th className="px-4 py-3">Created</th>
+              <th className="px-4 py-3">Manage</th>
             </tr>
           </thead>
-
-          <tbody className="divide-y divide-gray-100 text-sm xl:text-lg">
+          <tbody className="divide-y divide-gray-100 text-gray-700">
             {loading
               ? Array.from({ length: 6 }).map((_, idx) => (
                   <tr key={idx} className="animate-pulse">
                     {Array.from({ length: 7 }).map((__, colIdx) => (
                       <td key={colIdx} className="px-4 py-3">
-                        <div className="relative overflow-hidden rounded-md bg-gray-200 h-5 w-full">
+                        <div className="h-5 w-full bg-gray-200 rounded-md relative overflow-hidden">
                           <div className="absolute inset-0 -translate-x-full animate-[shimmer_1.5s_infinite] bg-gradient-to-r from-transparent via-white/50 to-transparent"></div>
                         </div>
                       </td>
@@ -185,29 +193,19 @@ export default function ProductsList() {
               : filteredProducts.length > 0
               ? filteredProducts.map((p) => (
                   <tr key={p.id} className="hover:bg-gray-50 transition">
-                    <td className="px-4 py-2 font-medium whitespace-nowrap">
-                      {p.productName || "-"}
+                    <td className="px-4 py-3 font-medium whitespace-nowrap">{p.productName || "-"}</td>
+                    <td className="px-4 py-3">₹{p.price || "-"}</td>
+                    <td className="px-4 py-3">{p.openingStock ?? "-"}</td>
+                    <td className="px-4 py-3">
+                      {typeof p.category === "object" ? p.category?.categoryName : p.category || "-"}
                     </td>
-                    <td className="px-4 py-2">₹{p.price || "-"}</td>
-                    <td className="px-4 py-2">{p.openingStock || "-"}</td>
-                    <td className="px-4 py-2">
-                      {typeof p.category === "object"
-                        ? p.category?.categoryName
-                        : p.category || "-"}
+                    <td className="px-4 py-3 max-w-xs truncate">{formatAttributes(p.attributes)}</td>
+                    <td className="px-4 py-3 text-gray-500">
+                      {p.createdAt ? new Date(p.createdAt).toLocaleString() : "-"}
                     </td>
-                    <td className="px-4 py-2 max-w-xs truncate">
-                      {p.attributes
-                        ? Object.entries(p.attributes)
-                            .map(([k, v]) => `${k}: ${Array.isArray(v) ? v.join(", ") : v}`)
-                            .join(" | ")
-                        : "-"}
-                    </td>
-                    <td className="px-4 py-2 text-gray-500">
-                      {p.createdAt ? new Date(p.createdAt).toLocaleDateString() : "-"}
-                    </td>
-                    <td className="px-4 py-2">
+                    <td className="px-4 py-3">
                       <button
-                        className="bg-[#8BE497] hover:scale-95 text-black px-3 py-1 rounded-lg transition"
+                        className="bg-green-300 hover:bg-green-400 text-black px-3 py-1 rounded-lg transition"
                         onClick={() => router.push(`/products/${p.id}`)}
                       >
                         Manage

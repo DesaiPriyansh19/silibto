@@ -35,7 +35,7 @@ const lowerNavLinks: Record<string, string> = {
   "Pending Inquiry": "",
   "Purchase Item1": "",
   "Purchase Item2": "",
-  "Inventry": "",
+  "Inventry": "/inventory/inventory-list",
 
   "Add New Client": "/clients/add-new-client",
   "Clients List":"/clients/client-list",
